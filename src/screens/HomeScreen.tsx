@@ -174,7 +174,8 @@ export default function GameScreen() {
       <View style={styles.livesContainer}>
         <Text style={styles.livesLabel}>HP:</Text>
         {Array.from({ length: 3 }, (_, index) => (
-          <View
+          <Image
+            source={require('../../assets/chak-empty.png')}
             key={index}
             style={[
               styles.chakChak,
@@ -403,20 +404,15 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   chakChak: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: '#FFD700', // Золотой цвет чак-чак
-    marginRight: 5,
-    shadowColor: '#FFD700',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
-    elevation: 3,
+    width: 40,
+    height: 40,
+    marginRight: -10,
   },
   chakChakEmpty: {
-    backgroundColor: '#D3D3D3', // Серый для пустых жизней
-    shadowOpacity: 0,
+    width: 40,
+    height: 40,
+    marginRight: -10,
+    filter: 'brightness(0%)',
   },
   userInfo: {
     flexDirection: 'row',
