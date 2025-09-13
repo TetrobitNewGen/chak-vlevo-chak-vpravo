@@ -138,7 +138,7 @@ export default function SettingsScreen() {
       icon: 'trending-up-outline',
       label: 'Сложность',
       value: difficulty === 'easy' ? 'Легкий' : difficulty === 'medium' ? 'Средний' : 'Сложный',
-      onPress: handleChangeDifficulty,git 
+      onPress: handleChangeDifficulty,
     },
     {
       id: '3',
