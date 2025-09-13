@@ -18,7 +18,7 @@ interface LeaderboardEntry {
   name: string;
   level: number;
   score: number;
-  avatar: string;
+  avatar: string | number;
   isCurrentUser?: boolean;
 }
 
@@ -89,7 +89,7 @@ export default function RatingScreen() {
       name: 'Вы',
       level: 10,
       score: 10000,
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
+      avatar: require('../../assets/ava2.jpg'),
       isCurrentUser: true,
     },
     {
@@ -103,10 +103,18 @@ export default function RatingScreen() {
   ];
 
   const renderLeaderboardEntry = (entry: LeaderboardEntry, index: number) => {
+    const isEven = index % 2 === 0;
     return (
-      <View key={entry.id} style={styles.leaderboardRow}>
+      <View key={entry.id} style={[
+        styles.leaderboardRow, 
+        entry.isCurrentUser && styles.currentUserRow,
+        !entry.isCurrentUser && isEven && styles.evenRow
+      ]}>
         <Text style={styles.rankText}>{entry.rank}.</Text>
-        <Image source={{ uri: entry.avatar }} style={styles.avatar} />
+        <Image 
+          source={typeof entry.avatar === 'string' ? { uri: entry.avatar } : entry.avatar} 
+          style={styles.avatar} 
+        />
         <View style={styles.playerInfo}>
           <Text style={[styles.playerName, entry.isCurrentUser && styles.currentUserText]}>
             {entry.name}
@@ -133,20 +141,17 @@ export default function RatingScreen() {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Title Section */}
-        <View style={styles.titleSection}>
-          <Text style={styles.subtitle}>лучшие игроки:</Text>
-          <Text style={styles.title}>Рейтинг</Text>
-        </View>
-
-        {/* Table Header */}
-        <View style={styles.tableHeader}>
-          <Text style={styles.headerColumnUser}>Пользователь</Text>
-          <Text style={styles.headerColumnScore}>Счёт</Text>
-        </View>
-
         {/* Leaderboard */}
         <View style={styles.leaderboardContainer}>
+          {/* Title Section */}
+          <View style={styles.titleSection}>
+            <Text style={styles.title}>Рейтинг</Text>
+          </View>
+          {/* Table Header */}
+          <View style={styles.tableHeader}>
+            <Text style={styles.headerColumnUser}>Пользователь</Text>
+            <Text style={styles.headerColumnScore}>Счёт</Text>
+          </View>
           {leaderboardData.slice(0, 7).map((entry, index) => renderLeaderboardEntry(entry, index))}
           
           {/* Ellipsis */}
@@ -190,15 +195,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   titleSection: {
-    padding: 20,
-    margin: 20,
+    padding: 24,
     backgroundColor: colors.white,
-    borderRadius: 8,
-    shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E9ECEF',
   },
   subtitle: {
     fontSize: 14,
@@ -206,53 +208,47 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 28,
+    fontWeight: '800',
     color: colors.text,
+    textAlign: 'center',
   },
   tableHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingVertical: 15,
-    marginHorizontal: 20,
-    marginBottom: 10,
-    backgroundColor: colors.white,
-    borderRadius: 8,
-    shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    paddingVertical: 18,
+    backgroundColor: '#F8F9FA',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E9ECEF',
   },
   headerColumnUser: {
-    fontSize: 14,
-    color: colors.gray,
-    fontWeight: '600',
+    fontSize: 16,
+    color: colors.primary,
+    fontWeight: '700',
   },
   headerColumnScore: {
-    fontSize: 14,
-    color: colors.gray,
-    fontWeight: '600',
+    fontSize: 16,
+    color: colors.primary,
+    fontWeight: '700',
   },
   leaderboardContainer: {
     marginHorizontal: 20,
     backgroundColor: colors.white,
-    borderRadius: 8,
+    borderRadius: 16,
     marginBottom: 20,
     shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 6,
+    overflow: 'hidden',
   },
   leaderboardRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
   },
   rankText: {
     fontSize: 16,
@@ -261,44 +257,55 @@ const styles = StyleSheet.create({
     width: 40,
   },
   avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginHorizontal: 10,
-    borderWidth: 2,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    marginHorizontal: 12,
+    borderWidth: 3,
     borderColor: colors.primary,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
   },
   playerInfo: {
     flex: 1,
   },
   playerName: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 17,
+    fontWeight: '700',
     color: colors.text,
-    marginBottom: 2,
+    marginBottom: 3,
   },
   currentUserText: {
     color: colors.primary,
     fontWeight: 'bold',
   },
   playerLevel: {
-    fontSize: 14,
-    color: '#4CAF50',
-    fontWeight: '500',
+    fontSize: 15,
+    color: colors.primary,
+    fontWeight: '600',
   },
   scoreText: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '800',
     color: colors.text,
   },
   ellipsisRow: {
     alignItems: 'center',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
+    paddingVertical: 12,
   },
   ellipsisText: {
     fontSize: 18,
     color: colors.gray,
+  },
+  currentUserRow: {
+    backgroundColor: '#E6F7FF', // Светло-голубой фон для текущего пользователя
+    borderLeftWidth: 4,
+    borderLeftColor: colors.primary,
+  },
+  evenRow: {
+    backgroundColor: '#FAFAFA', // Светло-серый фон для четных строк
   },
 });

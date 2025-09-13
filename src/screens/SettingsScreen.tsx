@@ -18,7 +18,7 @@ export default function SettingsScreen() {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [vibrationEnabled, setVibrationEnabled] = useState(true);
   const [difficulty, setDifficulty] = useState('medium');
-  const [userAvatar, setUserAvatar] = useState('https://via.placeholder.com/80x80/4CAF50/FFFFFF?text=Й');
+  const [userAvatar, setUserAvatar] = useState(require('../../assets/ava2.jpg'));
 
   const handleEditProfile = () => {
     Alert.alert(
@@ -64,7 +64,7 @@ export default function SettingsScreen() {
         <View style={styles.profileSection}>
           <TouchableOpacity onPress={handleChangeAvatar}>
             <Image
-              source={{ uri: userAvatar }}
+              source={userAvatar}
               style={styles.profileAvatar}
             />
             <View style={styles.editAvatarButton}>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,14 +10,23 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { colors } from '../utils/colors';
 
 const { width } = Dimensions.get('window');
 
 export default function ProfileScreen() {
   const navigation = useNavigation();
-  const [userAvatar] = useState('https://via.placeholder.com/120x120/4CAF50/FFFFFF?text=П');
+  const route = useRoute();
+  const [userAvatar] = useState(require('../../assets/ava2.jpg'));
+  const [currentLanguage, setCurrentLanguage] = useState('russian');
+
+  // Получаем выбранный язык от LanguageScreen
+  useEffect(() => {
+    if (route.params && (route.params as any).selectedLanguage) {
+      setCurrentLanguage((route.params as any).selectedLanguage);
+    }
+  }, [route.params]);
 
   const profileCards = [
     {
@@ -47,16 +56,20 @@ export default function ProfileScreen() {
     {
       id: '5',
       icon: 'settings-outline',
-      label: 'настройки:',
-      value: 'Сменить язык',
+      label: currentLanguage === 'russian' ? 'Русский 🇷🇺' : 'Татарский 🏴',
+      value: ' Сменить язык',
     },
     {
       id: '6',
       icon: 'cog-outline',
-      label: 'все настройки:',
-      value: 'Настройки игры',
+      label: '',
+      value: 'Все настройки',
     },
   ];
+
+  const handleLanguageChange = (newLanguage: string) => {
+    setCurrentLanguage(newLanguage);
+  };
 
   const handleCardPress = (cardId: string) => {
     if (cardId === '2') {
@@ -70,7 +83,7 @@ export default function ProfileScreen() {
       navigation.navigate('Favorites' as never);
     } else if (cardId === '5') {
       // Переход к настройкам языка
-      console.log('Переход к настройкам языка');
+      navigation.navigate('Language' as never);
     } else if (cardId === '6') {
       // Переход к настройкам игры
       navigation.navigate('Settings' as never);
@@ -96,12 +109,12 @@ export default function ProfileScreen() {
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Profile Section */}
-        <View style={styles.profileSection}>
-          <Image
-            source={{ uri: userAvatar }}
-            style={styles.profileAvatar}
-          />
-          <Text style={styles.profileName}>Помешанный</Text>
+         <View style={styles.profileSection}>
+           <Image
+             source={userAvatar}
+             style={styles.profileAvatar}
+           />
+          <Text style={styles.profileName}>Пользователь</Text>
           <Text style={styles.profileLevel}>10 уровень</Text>
         </View>
 

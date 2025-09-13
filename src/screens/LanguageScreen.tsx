@@ -1,0 +1,235 @@
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { colors } from '../utils/colors';
+
+export default function LanguageScreen() {
+  const navigation = useNavigation();
+  const [selectedLanguage, setSelectedLanguage] = useState('russian');
+
+  const languages = [
+    {
+      id: 'russian',
+      name: 'Русский',
+      flag: '🇷🇺',
+      description: 'Русский язык',
+      isSelected: selectedLanguage === 'russian',
+    },
+    {
+      id: 'tatar',
+      name: 'Татарский',
+      flag: '🏴',
+      description: 'Татар теле',
+      isSelected: selectedLanguage === 'tatar',
+    },
+  ];
+
+  const handleLanguageSelect = (languageId: string) => {
+    setSelectedLanguage(languageId);
+  };
+
+  const handleSave = () => {
+    // Здесь можно добавить логику сохранения выбранного языка
+    console.log('Выбранный язык:', selectedLanguage);
+    // Передаем выбранный язык обратно в ProfileScreen
+    (navigation as any).navigate('Profile', { selectedLanguage });
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="arrow-back" size={24} color={colors.white} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Выбор языка</Text>
+        <View style={styles.headerRight} />
+      </View>
+
+      <View style={styles.content}>
+        {/* Title Section */}
+        <View style={styles.titleSection}>
+          <Text style={styles.title}>Выберите язык</Text>
+          <Text style={styles.subtitle}>Выберите предпочитаемый язык интерфейса</Text>
+        </View>
+
+        {/* Language Options */}
+        <View style={styles.languageContainer}>
+          {languages.map((language) => (
+            <TouchableOpacity
+              key={language.id}
+              style={[
+                styles.languageCard,
+                language.isSelected && styles.selectedLanguageCard
+              ]}
+              onPress={() => handleLanguageSelect(language.id)}
+            >
+              <View style={styles.languageContent}>
+                <View style={styles.flagContainer}>
+                  <Text style={styles.flagText}>{language.flag}</Text>
+                </View>
+                <View style={styles.languageInfo}>
+                  <Text style={[
+                    styles.languageName,
+                    language.isSelected && styles.selectedLanguageName
+                  ]}>
+                    {language.name}
+                  </Text>
+                  <Text style={[
+                    styles.languageDescription,
+                    language.isSelected && styles.selectedLanguageDescription
+                  ]}>
+                    {language.description}
+                  </Text>
+                </View>
+                {language.isSelected && (
+                  <View style={styles.checkmarkContainer}>
+                    <Ionicons name="checkmark-circle" size={24} color={colors.primary} />
+                  </View>
+                )}
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Save Button */}
+        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+          <Text style={styles.saveButtonText}>Сохранить</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.white,
+  },
+  header: {
+    backgroundColor: colors.primary,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  backButton: {
+    padding: 5,
+  },
+  headerTitle: {
+    color: colors.white,
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  headerRight: {
+    width: 34, // Для симметрии
+  },
+  content: {
+    flex: 1,
+    padding: 20,
+  },
+  titleSection: {
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: colors.text,
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: colors.gray,
+    textAlign: 'center',
+  },
+  languageContainer: {
+    marginBottom: 30,
+  },
+  languageCard: {
+    backgroundColor: colors.white,
+    borderRadius: 16,
+    marginBottom: 15,
+    shadowColor: colors.black,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+    borderWidth: 2,
+    borderColor: '#F0F0F0',
+  },
+  selectedLanguageCard: {
+    borderColor: colors.primary,
+    backgroundColor: '#F0F8FF',
+  },
+  languageContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 20,
+  },
+  flagContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#F8F9FA',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 20,
+    borderWidth: 2,
+    borderColor: '#E9ECEF',
+  },
+  flagText: {
+    fontSize: 32,
+  },
+  languageInfo: {
+    flex: 1,
+  },
+  languageName: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: 4,
+  },
+  selectedLanguageName: {
+    color: colors.primary,
+  },
+  languageDescription: {
+    fontSize: 16,
+    color: colors.gray,
+  },
+  selectedLanguageDescription: {
+    color: colors.primary,
+    opacity: 0.8,
+  },
+  checkmarkContainer: {
+    marginLeft: 10,
+  },
+  saveButton: {
+    backgroundColor: colors.primary,
+    borderRadius: 16,
+    paddingVertical: 18,
+    alignItems: 'center',
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  saveButtonText: {
+    color: colors.white,
+    fontSize: 18,
+    fontWeight: '700',
+  },
+});
