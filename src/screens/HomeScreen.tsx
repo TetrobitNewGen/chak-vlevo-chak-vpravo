@@ -174,7 +174,8 @@ export default function GameScreen() {
       <View style={styles.livesContainer}>
         <Text style={styles.livesLabel}>HP:</Text>
         {Array.from({ length: 3 }, (_, index) => (
-          <View
+          <Image
+            source={require('../../assets/chak-empty.png')}
             key={index}
             style={[
               styles.chakChak,
@@ -271,11 +272,6 @@ export default function GameScreen() {
             <Text style={styles.languageLabel}>русский:</Text>
             <Text style={styles.russianWord}>{currentCard.russianWord}</Text>
           </View>
-
-          {/* Маскот персонаж */}
-          <View style={styles.mascotContainer}>
-            <Image style={styles.mascot} source={getMascotImage()} />
-          </View>
         </Animated.View>
       </PanGestureHandler>
     );
@@ -331,7 +327,12 @@ export default function GameScreen() {
       {/* Game Area */}
       <View style={styles.gameArea}>
         {renderCard()}
+        {!gameState.isGameOver && 
+          <View style={styles.mascotContainer}>
+            <Image style={styles.mascot} source={getMascotImage()} />
           </View>
+        }
+        </View>
 
       {/* Action Buttons */}
       <View style={styles.actionButtons}>
@@ -403,20 +404,15 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   chakChak: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: '#FFD700', // Золотой цвет чак-чак
-    marginRight: 5,
-    shadowColor: '#FFD700',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
-    elevation: 3,
+    width: 40,
+    height: 40,
+    marginRight: -10,
   },
   chakChakEmpty: {
-    backgroundColor: '#D3D3D3', // Серый для пустых жизней
-    shadowOpacity: 0,
+    width: 40,
+    height: 40,
+    marginRight: -10,
+    filter: 'brightness(0%)',
   },
   userInfo: {
     flexDirection: 'row',
@@ -479,6 +475,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 20,
     padding: 30,
+    paddingBottom: 120,
     shadowColor: colors.black,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.15,
@@ -525,6 +522,8 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   mascotContainer: {
+    position: 'absolute',
+    bottom: -20,
     alignItems: 'center',
     marginTop: 20,
   },
