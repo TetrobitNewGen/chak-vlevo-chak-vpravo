@@ -272,11 +272,6 @@ export default function GameScreen() {
             <Text style={styles.languageLabel}>русский:</Text>
             <Text style={styles.russianWord}>{currentCard.russianWord}</Text>
           </View>
-
-          {/* Маскот персонаж */}
-          <View style={styles.mascotContainer}>
-            <Image style={styles.mascot} source={getMascotImage()} />
-          </View>
         </Animated.View>
       </PanGestureHandler>
     );
@@ -332,7 +327,12 @@ export default function GameScreen() {
       {/* Game Area */}
       <View style={styles.gameArea}>
         {renderCard()}
+        {!gameState.isGameOver && 
+          <View style={styles.mascotContainer}>
+            <Image style={styles.mascot} source={getMascotImage()} />
           </View>
+        }
+        </View>
 
       {/* Action Buttons */}
       <View style={styles.actionButtons}>
@@ -475,6 +475,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 20,
     padding: 30,
+    paddingBottom: 120,
     shadowColor: colors.black,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.15,
@@ -521,6 +522,8 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   mascotContainer: {
+    position: 'absolute',
+    bottom: -20,
     alignItems: 'center',
     marginTop: 20,
   },
