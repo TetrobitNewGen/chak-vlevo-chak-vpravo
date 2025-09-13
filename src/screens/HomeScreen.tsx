@@ -14,6 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { colors } from '../utils/colors';
 import { WordCard, GameState, User } from '../types';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const { width, height } = Dimensions.get('window');
 
@@ -264,14 +265,15 @@ export default function GameScreen() {
 
           {/* Маскот персонаж */}
           <View style={styles.mascotContainer}>
-            <View style={styles.mascot}>
+            {/* <View style={styles.mascot}>
               <View style={styles.mascotBody} />
               <View style={styles.mascotCap} />
               <View style={styles.mascotEyes}>
                 <View style={styles.eye} />
                 <View style={styles.eye} />
               </View>
-            </View>
+            </View> */}
+            <Image style={styles.mascot} source={require('../../assets/chak.jpg')} />
           </View>
         </Animated.View>
       </PanGestureHandler>
@@ -286,19 +288,20 @@ export default function GameScreen() {
           style={styles.menuButton}
           onPress={() => navigation.navigate('Profile' as never)}
         >
-          <Ionicons name="menu" size={24} color={colors.white} />
+          <Ionicons name="menu" size={30} color={'#000'} />
         </TouchableOpacity>
         
         <View style={styles.userInfo}>
           <View style={styles.userTextInfo}>
-            <Text style={styles.userName}>{mockUser.name}</Text>
-            <Text style={styles.userLevel}>{mockUser.level} уровень</Text>
+            <Text style={styles.userLevel}>Уровень {mockUser.level}</Text>
+            <Text style={styles.userHint}>10 xp до нового уровня!</Text>
           </View>
-          <View style={styles.avatarContainer}>
+
+          <LinearGradient colors={['#FFF176', '#FF9800', '#5D08B8']} locations={[0, 0.3, 1]} style={styles.avatarContainer}>
             <View style={styles.avatarPlaceholder}>
-              <View style={styles.chakChakAvatar} />
+              <Image source={require('../../assets/ava2.jpg')} style={styles.chakChakAvatar} />
             </View>
-          </View>
+          </LinearGradient>
         </View>
       </View>
 
@@ -341,10 +344,10 @@ export default function GameScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF8E1', // Светло-желтый фон как на фото
+    backgroundColor: '#fff', // Светло-желтый фон как на фото
   },
   header: {
-    backgroundColor: colors.primary,
+    backgroundColor: '#fff',
     paddingHorizontal: 20,
     paddingVertical: 15,
     flexDirection: 'row',
@@ -408,15 +411,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-end',
     flex: 1,
-    paddingRight: 20,
   },
   avatarContainer: {
     marginLeft: 15,
+    borderRadius: 30,
+    padding: 7,
   },
   avatarPlaceholder: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 47,
+    height: 47,
+    borderRadius: 30,
     backgroundColor: colors.white,
     justifyContent: 'center',
     alignItems: 'center',
@@ -427,9 +431,9 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   chakChakAvatar: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: '#FFD700',
     shadowColor: '#FFD700',
     shadowOffset: { width: 0, height: 2 },
@@ -440,15 +444,15 @@ const styles = StyleSheet.create({
   userTextInfo: {
     alignItems: 'flex-end',
   },
-  userName: {
-    color: colors.white,
-    fontSize: 18,
-    fontWeight: 'bold',
+  userHint: {
+    color: '#8B8B8B',
+    fontSize: 14,
+    fontWeight: 'light',
     marginBottom: 2,
   },
   userLevel: {
-    color: colors.secondary,
-    fontSize: 14,
+    color: '#32D392',
+    fontSize: 18,
     fontWeight: '600',
   },
   gameArea: {
@@ -460,7 +464,7 @@ const styles = StyleSheet.create({
   card: {
     width: width - 40,
     height: height * 0.6,
-    backgroundColor: colors.white,
+    backgroundColor: '#fff',
     borderRadius: 20,
     padding: 30,
     shadowColor: colors.black,
@@ -514,8 +518,8 @@ const styles = StyleSheet.create({
   },
   mascot: {
     position: 'relative',
-    width: 80,
-    height: 80,
+    width: 120,
+    height: 120,
   },
   mascotBody: {
     width: 60,
