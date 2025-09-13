@@ -273,7 +273,7 @@ export default function GameScreen() {
                 <View style={styles.eye} />
               </View>
             </View> */}
-            <Image style={styles.mascot} source={require('../../assets/chak.jpg')} />
+            <Image style={styles.mascot} source={require('../../assets/chak-think.png')} />
           </View>
         </Animated.View>
       </PanGestureHandler>
@@ -518,8 +518,8 @@ const styles = StyleSheet.create({
   },
   mascot: {
     position: 'relative',
-    width: 120,
-    height: 120,
+    width: 150,
+    height: 150,
   },
   mascotBody: {
     width: 60,
