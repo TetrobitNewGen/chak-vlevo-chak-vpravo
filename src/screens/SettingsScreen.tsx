@@ -14,30 +14,30 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../utils/colors';
 
 export default function SettingsScreen() {
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [darkModeEnabled, setDarkModeEnabled] = useState(false);
-  const [autoPlayEnabled, setAutoPlayEnabled] = useState(true);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [vibrationEnabled, setVibrationEnabled] = useState(true);
+  const [difficulty, setDifficulty] = useState('medium');
 
   const handleEditProfile = () => {
     Alert.alert('Редактирование профиля', 'Функция редактирования профиля будет добавлена в следующей версии');
   };
 
-  const handleChangeLanguage = () => {
-    Alert.alert('Смена языка', 'Выберите язык интерфейса', [
-      { text: 'Русский', onPress: () => console.log('Русский выбран') },
-      { text: 'Татарский', onPress: () => console.log('Татарский выбран') },
-      { text: 'English', onPress: () => console.log('English выбран') },
+  const handleChangeDifficulty = () => {
+    Alert.alert('Сложность', 'Выберите уровень сложности', [
+      { text: 'Легкий', onPress: () => setDifficulty('easy') },
+      { text: 'Средний', onPress: () => setDifficulty('medium') },
+      { text: 'Сложный', onPress: () => setDifficulty('hard') },
       { text: 'Отмена', style: 'cancel' },
     ]);
   };
 
-  const handleLogout = () => {
+  const handleResetProgress = () => {
     Alert.alert(
-      'Выход',
-      'Вы уверены, что хотите выйти из приложения?',
+      'Сброс прогресса',
+      'Вы уверены, что хотите сбросить весь прогресс? Это действие нельзя отменить.',
       [
         { text: 'Отмена', style: 'cancel' },
-        { text: 'Выйти', style: 'destructive', onPress: () => console.log('Выход') },
+        { text: 'Сбросить', style: 'destructive', onPress: () => console.log('Прогресс сброшен') },
       ]
     );
   };
@@ -62,9 +62,9 @@ export default function SettingsScreen() {
           <Text style={styles.profileLevel}>10 уровень</Text>
         </View>
 
-        {/* Settings Options */}
+        {/* Game Settings */}
         <View style={styles.settingsContainer}>
-          <Text style={styles.sectionTitle}>Настройки</Text>
+          <Text style={styles.sectionTitle}>Игровые настройки</Text>
           
           <TouchableOpacity style={styles.settingItem} onPress={handleEditProfile}>
             <View style={styles.settingLeft}>
@@ -74,61 +74,57 @@ export default function SettingsScreen() {
             <Ionicons name="chevron-forward" size={20} color={colors.gray} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.settingItem} onPress={handleChangeLanguage}>
+          <TouchableOpacity style={styles.settingItem} onPress={handleChangeDifficulty}>
             <View style={styles.settingLeft}>
-              <View style={styles.flagIcon}>
-                <View style={styles.flagRed} />
-                <View style={styles.flagWhite} />
-                <View style={styles.flagGreen} />
-              </View>
-              <Text style={styles.settingText}>Сменить язык</Text>
+              <Ionicons name="trending-up-outline" size={24} color={colors.primary} />
+              <Text style={styles.settingText}>Сложность: {difficulty === 'easy' ? 'Легкий' : difficulty === 'medium' ? 'Средний' : 'Сложный'}</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color={colors.gray} />
           </TouchableOpacity>
         </View>
 
-        {/* Preferences */}
+        {/* Audio & Vibration */}
         <View style={styles.settingsContainer}>
-          <Text style={styles.sectionTitle}>Предпочтения</Text>
+          <Text style={styles.sectionTitle}>Звук и вибрация</Text>
           
           <View style={styles.settingItem}>
             <View style={styles.settingLeft}>
-              <Ionicons name="notifications-outline" size={24} color={colors.primary} />
-              <Text style={styles.settingText}>Уведомления</Text>
+              <Ionicons name="volume-high-outline" size={24} color={colors.primary} />
+              <Text style={styles.settingText}>Звук</Text>
             </View>
             <Switch
-              value={notificationsEnabled}
-              onValueChange={setNotificationsEnabled}
+              value={soundEnabled}
+              onValueChange={setSoundEnabled}
               trackColor={{ false: colors.lightGray, true: colors.primaryLight }}
-              thumbColor={notificationsEnabled ? colors.white : colors.gray}
+              thumbColor={soundEnabled ? colors.white : colors.gray}
             />
           </View>
 
           <View style={styles.settingItem}>
             <View style={styles.settingLeft}>
-              <Ionicons name="moon-outline" size={24} color={colors.primary} />
-              <Text style={styles.settingText}>Темная тема</Text>
+              <Ionicons name="phone-portrait-outline" size={24} color={colors.primary} />
+              <Text style={styles.settingText}>Вибрация</Text>
             </View>
             <Switch
-              value={darkModeEnabled}
-              onValueChange={setDarkModeEnabled}
+              value={vibrationEnabled}
+              onValueChange={setVibrationEnabled}
               trackColor={{ false: colors.lightGray, true: colors.primaryLight }}
-              thumbColor={darkModeEnabled ? colors.white : colors.gray}
+              thumbColor={vibrationEnabled ? colors.white : colors.gray}
             />
           </View>
+        </View>
 
-          <View style={styles.settingItem}>
+        {/* Progress */}
+        <View style={styles.settingsContainer}>
+          <Text style={styles.sectionTitle}>Прогресс</Text>
+          
+          <TouchableOpacity style={styles.settingItem} onPress={handleResetProgress}>
             <View style={styles.settingLeft}>
-              <Ionicons name="play-outline" size={24} color={colors.primary} />
-              <Text style={styles.settingText}>Автовоспроизведение</Text>
+              <Ionicons name="refresh-outline" size={24} color={colors.error} />
+              <Text style={[styles.settingText, { color: colors.error }]}>Сбросить прогресс</Text>
             </View>
-            <Switch
-              value={autoPlayEnabled}
-              onValueChange={setAutoPlayEnabled}
-              trackColor={{ false: colors.lightGray, true: colors.primaryLight }}
-              thumbColor={autoPlayEnabled ? colors.white : colors.gray}
-            />
-          </View>
+            <Ionicons name="chevron-forward" size={20} color={colors.gray} />
+          </TouchableOpacity>
         </View>
 
         {/* App Info */}
@@ -160,11 +156,32 @@ export default function SettingsScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Logout */}
-        <View style={styles.logoutContainer}>
-          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-            <Ionicons name="log-out-outline" size={24} color={colors.error} />
-            <Text style={styles.logoutText}>Выйти</Text>
+        {/* App Info */}
+        <View style={styles.settingsContainer}>
+          <Text style={styles.sectionTitle}>О приложении</Text>
+          
+          <TouchableOpacity style={styles.settingItem}>
+            <View style={styles.settingLeft}>
+              <Ionicons name="help-circle-outline" size={24} color={colors.primary} />
+              <Text style={styles.settingText}>Правила игры</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={colors.gray} />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.settingItem}>
+            <View style={styles.settingLeft}>
+              <Ionicons name="information-circle-outline" size={24} color={colors.primary} />
+              <Text style={styles.settingText}>О приложении</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={colors.gray} />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.settingItem}>
+            <View style={styles.settingLeft}>
+              <Ionicons name="star-outline" size={24} color={colors.primary} />
+              <Text style={styles.settingText}>Оценить приложение</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={colors.gray} />
           </TouchableOpacity>
         </View>
 

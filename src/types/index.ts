@@ -5,48 +5,29 @@ export interface User {
   avatar?: string;
 }
 
-export interface Course {
+export interface WordCard {
   id: string;
-  title: string;
-  difficulty: string;
-  rating: number;
-  image: string;
-  description?: string;
+  tatarWord: string;
+  russianWord: string;
+  isCorrect: boolean; // правильный ли перевод
+  difficulty: 'easy' | 'medium' | 'hard';
 }
 
-export interface Event {
-  id: string;
-  title: string;
-  date: string;
-  time: string;
-  location: string;
-  image: string;
-  description?: string;
+export interface GameState {
+  currentCardIndex: number;
+  lives: number; // количество чак-чак (жизней)
+  score: number;
+  streak: number; // серия правильных ответов
+  isGameOver: boolean;
 }
 
-export interface ForumPost {
-  id: string;
-  title: string;
-  author: string;
-  content: string;
-  timestamp: string;
-  likes: number;
-  comments: number;
+export interface SwipeDirection {
+  direction: 'left' | 'right';
+  cardId: string;
 }
 
 export type RootStackParamList = {
-  Main: undefined;
-  Course: { courseId: string };
-  Event: { eventId: string };
-  Forum: undefined;
-  Settings: undefined;
-};
-
-export type DrawerParamList = {
-  Home: undefined;
-  Courses: undefined;
-  Events: undefined;
-  Forum: undefined;
+  Game: undefined;
   Settings: undefined;
 };
 
