@@ -13,7 +13,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { launchImageLibrary, ImagePickerResponse, MediaType } from 'react-native-image-picker';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { colors } from '../utils/colors';
@@ -26,7 +26,7 @@ export default function SettingsScreen() {
   const navigation = useNavigation();
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [vibrationEnabled, setVibrationEnabled] = useState(true);
-  const [difficulty, setDifficulty] = useState('medium');
+  const [difficulty, setDifficulty] = useState(userStore.getDifficulty());
   const [userAvatar, setUserAvatar] = useState(require('../../assets/ava2.jpg'));
   const [userName, setUserName] = useState(userStore.getUserName());
   const [showEditModal, setShowEditModal] = useState(false);
@@ -35,13 +35,25 @@ export default function SettingsScreen() {
   const [newName, setNewName] = useState('');
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 
+  // Загружаем сохраненную сложность при запуске
+  useEffect(() => {
+    loadDifficulty();
+  }, []);
+
   // Подписываемся на изменения в глобальном хранилище
   useEffect(() => {
     const unsubscribe = userStore.subscribe(() => {
       setUserName(userStore.getUserName());
+      setDifficulty(userStore.getDifficulty());
     });
     return unsubscribe;
   }, []);
+
+  const loadDifficulty = async () => {
+    await userStore.loadDifficultyFromStorage();
+    setDifficulty(userStore.getDifficulty());
+  };
+
 
   const handleEditProfile = () => {
     setShowEditModal(true);
@@ -107,9 +119,21 @@ export default function SettingsScreen() {
 
   const handleChangeDifficulty = () => {
     Alert.alert('Сложность', 'Выберите уровень сложности', [
-      { text: 'Легкий', onPress: () => setDifficulty('easy') },
-      { text: 'Средний', onPress: () => setDifficulty('medium') },
-      { text: 'Сложный', onPress: () => setDifficulty('hard') },
+      { text: 'Легкий', onPress: () => {
+          setDifficulty('easy');
+          userStore.setDifficulty('easy');
+        }
+      },
+      { text: 'Средний', onPress: () => {
+          setDifficulty('medium');
+          userStore.setDifficulty('medium');
+        }
+      },
+      { text: 'Сложный', onPress: () => {
+          setDifficulty('hard');
+          userStore.setDifficulty('hard');
+        }
+      },
       { text: 'Отмена', style: 'cancel' },
     ]);
   };
@@ -183,39 +207,19 @@ export default function SettingsScreen() {
       value: 'В App Store',
       onPress: () => console.log('Оценить приложение'),
     },
+    {
+      id: '9',
+      icon: 'color-palette-outline',
+      label: 'Скины',
+      value: 'Темы оформления',
+      onPress: () => console.log('Скины'),
+    },
   ];
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons name="arrow-back" size={24} color={colors.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Настройки</Text>
-        <View style={styles.headerRight} />
-      </View>
+    <View style={styles.container}>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Profile Section */}
-        <View style={styles.profileSection}>
-          <LinearGradient colors={['#FFF176', '#FF9800', '#5D08B8']} locations={[0, 0.3, 1]} style={styles.avatarContainer}>
-            <View style={styles.avatarPlaceholder}>
-              <TouchableOpacity onPress={handleEditProfile}>
-                <Image source={userAvatar} style={styles.profileAvatar} />
-                <View style={styles.editAvatarButton}>
-                  <Ionicons name="camera" size={16} color={colors.white} />
-                </View>
-              </TouchableOpacity>
-            </View>
-          </LinearGradient>
-          <Text style={styles.profileName}>{userName}</Text>
-          <Text style={styles.profileLevel}>Уровень 10</Text>
-          <Text style={styles.profileHint}>10 xp до нового уровня!</Text>
-        </View>
 
         {/* Settings Cards Grid */}
         <View style={styles.cardsContainer}>
@@ -370,7 +374,7 @@ export default function SettingsScreen() {
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -379,90 +383,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.white,
   },
-  header: {
-    backgroundColor: colors.white,
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
-  },
-  backButton: {
-    padding: 5,
-  },
-  headerTitle: {
-    color: colors.text,
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  headerRight: {
-    width: 34, // Для симметрии
-  },
   content: {
     flex: 1,
   },
-  profileSection: {
-    alignItems: 'center',
-    paddingVertical: 40,
-    backgroundColor: colors.white,
-  },
-  avatarContainer: {
-    borderRadius: 50,
-    padding: 8,
-    marginBottom: 20,
-  },
-  avatarPlaceholder: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: colors.white,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  profileAvatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-  },
-  editAvatarButton: {
-    position: 'absolute',
-    bottom: 5,
-    right: 5,
-    backgroundColor: colors.primary,
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: colors.white,
-  },
-  profileName: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginBottom: 8,
-  },
-  profileLevel: {
-    fontSize: 18,
-    color: '#32D392',
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  profileHint: {
-    color: '#8B8B8B',
-    fontSize: 14,
-    fontWeight: 'light',
-  },
   cardsContainer: {
     paddingHorizontal: 20,
+    paddingTop: 50,
     paddingBottom: 20,
     flexDirection: 'row',
     flexWrap: 'wrap',

@@ -26,7 +26,7 @@ export default function LanguageScreen() {
     {
       id: 'tatar',
       name: 'Татарский',
-      flag: '🏴',
+      flag: 'custom',
       description: 'Татар теле',
       isSelected: selectedLanguage === 'tatar',
     },
@@ -77,7 +77,15 @@ export default function LanguageScreen() {
             >
               <View style={styles.languageContent}>
                 <View style={styles.flagContainer}>
-                  <Text style={styles.flagText}>{language.flag}</Text>
+                  {language.flag === 'custom' ? (
+                    <View style={styles.customFlag}>
+                      <View style={styles.flagGreen} />
+                      <View style={styles.flagWhite} />
+                      <View style={styles.flagRed} />
+                    </View>
+                  ) : (
+                    <Text style={styles.flagText}>{language.flag}</Text>
+                  )}
                 </View>
                 <View style={styles.languageInfo}>
                   <Text style={[
@@ -194,6 +202,31 @@ const styles = StyleSheet.create({
   },
   flagText: {
     fontSize: 32,
+  },
+  flagImage: {
+    width: 50,
+    height: 35,
+    borderRadius: 4,
+  },
+  customFlag: {
+    width: 50,
+    height: 35,
+    borderRadius: 4,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+  },
+  flagGreen: {
+    flex: 1,
+    backgroundColor: '#2E7D32',
+  },
+  flagWhite: {
+    height: 3,
+    backgroundColor: '#FFFFFF',
+  },
+  flagRed: {
+    flex: 1,
+    backgroundColor: '#D32F2F',
   },
   languageInfo: {
     flex: 1,

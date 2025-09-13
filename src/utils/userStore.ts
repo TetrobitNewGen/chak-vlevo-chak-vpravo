@@ -1,7 +1,10 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 // Глобальное хранилище для данных пользователя
 class UserStore {
   private userName: string = 'Йенифер';
   private userAvatar: string = '';
+  private difficulty: string = 'medium';
   private listeners: Array<() => void> = [];
 
   getUserName(): string {
@@ -20,6 +23,36 @@ class UserStore {
   setUserAvatar(avatar: string): void {
     this.userAvatar = avatar;
     this.notifyListeners();
+  }
+
+  getDifficulty(): string {
+    return this.difficulty;
+  }
+
+  setDifficulty(difficulty: string): void {
+    this.difficulty = difficulty;
+    this.saveDifficultyToStorage(difficulty);
+    this.notifyListeners();
+  }
+
+  private async saveDifficultyToStorage(difficulty: string): Promise<void> {
+    try {
+      await AsyncStorage.setItem('difficulty', difficulty);
+    } catch (error) {
+      console.log('Ошибка сохранения сложности в userStore:', error);
+    }
+  }
+
+  async loadDifficultyFromStorage(): Promise<void> {
+    try {
+      const savedDifficulty = await AsyncStorage.getItem('difficulty');
+      if (savedDifficulty) {
+        this.difficulty = savedDifficulty;
+        this.notifyListeners();
+      }
+    } catch (error) {
+      console.log('Ошибка загрузки сложности в userStore:', error);
+    }
   }
 
   // Подписка на изменения
