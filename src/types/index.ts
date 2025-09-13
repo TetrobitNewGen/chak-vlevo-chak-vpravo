@@ -29,6 +29,9 @@ export interface SwipeDirection {
 export type RootStackParamList = {
   Game: undefined;
   Profile: undefined;
+  Rating: undefined; // Added for the new Rating screen
+  Statistics: undefined; // Added for the new Statistics screen
+  Favorites: undefined; // Added for the new Favorites screen
   Settings: undefined;
 };
 
