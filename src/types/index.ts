@@ -28,6 +28,7 @@ export interface SwipeDirection {
 
 export type RootStackParamList = {
   Game: undefined;
+  Profile: undefined;
   Settings: undefined;
 };
 

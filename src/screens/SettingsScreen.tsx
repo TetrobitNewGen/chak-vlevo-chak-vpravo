@@ -9,6 +9,7 @@ import {
   Switch,
   Alert,
 } from 'react-native';
+// import { launchImageLibrary } from 'react-native-image-picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../utils/colors';
@@ -17,9 +18,22 @@ export default function SettingsScreen() {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [vibrationEnabled, setVibrationEnabled] = useState(true);
   const [difficulty, setDifficulty] = useState('medium');
+  const [userAvatar, setUserAvatar] = useState('https://via.placeholder.com/80x80/4CAF50/FFFFFF?text=Й');
 
   const handleEditProfile = () => {
-    Alert.alert('Редактирование профиля', 'Функция редактирования профиля будет добавлена в следующей версии');
+    Alert.alert(
+      'Редактирование профиля',
+      'Выберите действие',
+      [
+        { text: 'Отмена', style: 'cancel' },
+        { text: 'Изменить фото', onPress: handleChangeAvatar },
+        { text: 'Изменить имя', onPress: () => Alert.alert('Скоро', 'Функция изменения имени будет добавлена') },
+      ]
+    );
+  };
+
+  const handleChangeAvatar = () => {
+    Alert.alert('Смена аватара', 'Функция смены аватара будет добавлена в следующей версии');
   };
 
   const handleChangeDifficulty = () => {
@@ -44,20 +58,19 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Настройки</Text>
-        <TouchableOpacity style={styles.menuButton}>
-          <Ionicons name="menu" size={24} color={colors.white} />
-        </TouchableOpacity>
-      </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Profile Section */}
         <View style={styles.profileSection}>
-          <Image
-            source={{ uri: 'https://via.placeholder.com/80x80/4CAF50/FFFFFF?text=Й' }}
-            style={styles.profileAvatar}
-          />
+          <TouchableOpacity onPress={handleChangeAvatar}>
+            <Image
+              source={{ uri: userAvatar }}
+              style={styles.profileAvatar}
+            />
+            <View style={styles.editAvatarButton}>
+              <Ionicons name="camera" size={16} color={colors.white} />
+            </View>
+          </TouchableOpacity>
           <Text style={styles.profileName}>Йенифер</Text>
           <Text style={styles.profileLevel}>10 уровень</Text>
         </View>
@@ -134,35 +147,6 @@ export default function SettingsScreen() {
           <TouchableOpacity style={styles.settingItem}>
             <View style={styles.settingLeft}>
               <Ionicons name="help-circle-outline" size={24} color={colors.primary} />
-              <Text style={styles.settingText}>Помощь и поддержка</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color={colors.gray} />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.settingItem}>
-            <View style={styles.settingLeft}>
-              <Ionicons name="information-circle-outline" size={24} color={colors.primary} />
-              <Text style={styles.settingText}>О приложении</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color={colors.gray} />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.settingItem}>
-            <View style={styles.settingLeft}>
-              <Ionicons name="star-outline" size={24} color={colors.primary} />
-              <Text style={styles.settingText}>Оценить приложение</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color={colors.gray} />
-          </TouchableOpacity>
-        </View>
-
-        {/* App Info */}
-        <View style={styles.settingsContainer}>
-          <Text style={styles.sectionTitle}>О приложении</Text>
-          
-          <TouchableOpacity style={styles.settingItem}>
-            <View style={styles.settingLeft}>
-              <Ionicons name="help-circle-outline" size={24} color={colors.primary} />
               <Text style={styles.settingText}>Правила игры</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color={colors.gray} />
@@ -199,22 +183,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  header: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  headerTitle: {
-    color: colors.white,
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  menuButton: {
-    padding: 5,
-  },
   content: {
     flex: 1,
   },
@@ -229,6 +197,19 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 40,
     marginBottom: 15,
+  },
+  editAvatarButton: {
+    position: 'absolute',
+    bottom: 10,
+    right: 10,
+    backgroundColor: colors.primary,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: colors.white,
   },
   profileName: {
     fontSize: 24,

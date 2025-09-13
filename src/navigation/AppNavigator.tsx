@@ -8,6 +8,7 @@ import { RootStackParamList } from '../types';
 
 // Импорт экранов
 import GameScreen from '../screens/HomeScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -37,6 +38,13 @@ export default function AppNavigator() {
         }}
       >
         <Stack.Screen name="Game" component={GameScreen} />
+        <Stack.Screen 
+          name="Profile" 
+          component={ProfileScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
         <Stack.Screen 
           name="Settings" 
           component={SettingsScreen}
