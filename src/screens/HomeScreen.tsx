@@ -80,6 +80,7 @@ export default function GameScreen() {
     streak: 0,
     isGameOver: false,
   });
+  const [mascotImage, setMascotImage] = useState<'think' | 'good' | 'fail'>('think');
 
   const translateX = useRef(new Animated.Value(0)).current;
   const rotate = useRef(new Animated.Value(0)).current;
@@ -121,6 +122,14 @@ export default function GameScreen() {
 
     const isCorrectAnswer = (direction === 'right' && currentCard.isCorrect) || 
                            (direction === 'left' && !currentCard.isCorrect);
+
+    // Меняем картинку маскота в зависимости от ответа
+    setMascotImage(isCorrectAnswer ? 'good' : 'fail');
+
+    // Возвращаем картинку к исходной через 1.5 секунды
+    setTimeout(() => {
+      setMascotImage('think');
+    }, 1500);
 
     // Анимация свайпа
     Animated.parallel([
@@ -265,19 +274,22 @@ export default function GameScreen() {
 
           {/* Маскот персонаж */}
           <View style={styles.mascotContainer}>
-            {/* <View style={styles.mascot}>
-              <View style={styles.mascotBody} />
-              <View style={styles.mascotCap} />
-              <View style={styles.mascotEyes}>
-                <View style={styles.eye} />
-                <View style={styles.eye} />
-              </View>
-            </View> */}
-            <Image style={styles.mascot} source={require('../../assets/chak-think.png')} />
+            <Image style={styles.mascot} source={getMascotImage()} />
           </View>
         </Animated.View>
       </PanGestureHandler>
     );
+  };
+
+  const getMascotImage = () => {
+    switch (mascotImage) {
+      case 'good':
+        return require('../../assets/chak-good.png');
+      case 'fail':
+        return require('../../assets/chak-fail.png');
+      default:
+        return require('../../assets/chak-think.png');
+    }
   };
 
   return (
