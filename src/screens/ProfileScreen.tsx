@@ -22,47 +22,56 @@ export default function ProfileScreen() {
   const profileCards = [
     {
       id: '1',
+      icon: 'person-outline',
+      label: 'профиль:',
+      value: 'Помешанный',
+    },
+    {
+      id: '2',
       icon: 'bar-chart-outline',
       label: 'рейтинг:',
       value: '9274 место',
     },
     {
-      id: '2',
+      id: '3',
       icon: 'trending-up-outline',
       label: 'статистика:',
       value: '10 дней',
     },
     {
-      id: '3',
+      id: '4',
       icon: 'heart-outline',
       label: 'любимое:',
       value: '15 слов',
     },
     {
-      id: '4',
+      id: '5',
       icon: 'settings-outline',
       label: 'настройки:',
       value: 'Сменить язык',
     },
     {
-      id: '5',
+      id: '6',
       icon: 'cog-outline',
       label: 'все настройки:',
       value: 'Настройки игры',
     },
-    {
-      id: '6',
-      icon: 'person-outline',
-      label: 'профиль:',
-      value: 'Помешанный',
-    },
   ];
 
   const handleCardPress = (cardId: string) => {
-    if (cardId === '4') {
+    if (cardId === '2') {
+      // Переход к рейтингу
+      navigation.navigate('Rating' as never);
+    } else if (cardId === '3') {
+      // Переход к статистике
+      navigation.navigate('Statistics' as never);
+    } else if (cardId === '4') {
+      // Переход к любимым словам
+      navigation.navigate('Favorites' as never);
+    } else if (cardId === '5') {
       // Переход к настройкам языка
       console.log('Переход к настройкам языка');
-    } else if (cardId === '5') {
+    } else if (cardId === '6') {
       // Переход к настройкам игры
       navigation.navigate('Settings' as never);
     } else {

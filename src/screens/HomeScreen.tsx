@@ -312,9 +312,9 @@ export default function GameScreen() {
           {gameState.streak > 0 && (
             <Text style={styles.streakText}>Серия: {gameState.streak}</Text>
           )}
-        </View>
+          </View>
         {renderChakChakLives()}
-      </View>
+        </View>
 
       {/* Game Area */}
       <View style={styles.gameArea}>
