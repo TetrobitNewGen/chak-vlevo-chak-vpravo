@@ -172,7 +172,7 @@ export default function FavoritesScreen() {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name="arrow-back" size={24} color={colors.white} />
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Любимые слова</Text>
         <View style={styles.headerRight} />
@@ -209,20 +209,22 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
   },
   header: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.white,
     paddingHorizontal: 20,
     paddingVertical: 15,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
   },
   backButton: {
     padding: 5,
   },
   headerTitle: {
-    color: colors.white,
+    color: colors.text,
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
   headerRight: {
     width: 34, // Для симметрии
@@ -248,7 +250,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: '600',
     color: colors.text,
   },
   countContainer: {
@@ -256,13 +258,13 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 20,
     padding: 30,
-    borderRadius: 15,
+    borderRadius: 20,
     alignItems: 'center',
     shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
     borderLeftWidth: 4,
     borderLeftColor: '#E91E63',
   },
@@ -271,7 +273,7 @@ const styles = StyleSheet.create({
   },
   countNumber: {
     fontSize: 48,
-    fontWeight: 'bold',
+    fontWeight: '600',
     color: '#E91E63',
     marginBottom: 8,
   },
@@ -286,13 +288,13 @@ const styles = StyleSheet.create({
   },
   wordCard: {
     backgroundColor: colors.white,
-    borderRadius: 12,
+    borderRadius: 20,
     marginBottom: 12,
     shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
   },
   wordContent: {
     flexDirection: 'row',
@@ -304,7 +306,7 @@ const styles = StyleSheet.create({
   },
   tatarWord: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: '600',
     color: colors.text,
     marginBottom: 4,
   },
@@ -323,6 +325,6 @@ const styles = StyleSheet.create({
   difficultyText: {
     fontSize: 12,
     color: colors.white,
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
 });

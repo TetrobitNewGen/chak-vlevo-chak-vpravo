@@ -72,7 +72,7 @@ export default function RatingScreen() {
       rank: 6,
       name: 'Алексей',
       level: 10,
-      score: 10000,
+      score: 10500,
       avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face',
     },
     {
@@ -80,12 +80,12 @@ export default function RatingScreen() {
       rank: 7,
       name: 'Ольга',
       level: 9,
-      score: 9000,
+      score: 10200,
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face',
     },
     {
       id: '8',
-      rank: 93274,
+      rank: 1247,
       name: 'Вы',
       level: 10,
       score: 10000,
@@ -94,10 +94,10 @@ export default function RatingScreen() {
     },
     {
       id: '9',
-      rank: 93275,
+      rank: 1248,
       name: 'Иван',
       level: 8,
-      score: 8000,
+      score: 9800,
       avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face',
     },
   ];
@@ -134,7 +134,7 @@ export default function RatingScreen() {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name="arrow-back" size={24} color={colors.white} />
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Рейтинг</Text>
         <View style={styles.headerRight} />
@@ -173,20 +173,22 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
   },
   header: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.white,
     paddingHorizontal: 20,
     paddingVertical: 15,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
   },
   backButton: {
     padding: 5,
   },
   headerTitle: {
-    color: colors.white,
+    color: colors.text,
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
   headerRight: {
     width: 34, // Для симметрии
@@ -209,7 +211,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontWeight: '800',
+    fontWeight: '600',
     color: colors.text,
     textAlign: 'center',
   },
@@ -235,13 +237,13 @@ const styles = StyleSheet.create({
   leaderboardContainer: {
     marginHorizontal: 20,
     backgroundColor: colors.white,
-    borderRadius: 16,
+    borderRadius: 20,
     marginBottom: 20,
     shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 6,
+    shadowRadius: 12,
+    elevation: 8,
     overflow: 'hidden',
   },
   leaderboardRow: {
@@ -252,7 +254,7 @@ const styles = StyleSheet.create({
   },
   rankText: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '600',
     color: colors.text,
     width: 40,
   },
@@ -274,13 +276,13 @@ const styles = StyleSheet.create({
   },
   playerName: {
     fontSize: 17,
-    fontWeight: '700',
+    fontWeight: '600',
     color: colors.text,
     marginBottom: 3,
   },
   currentUserText: {
     color: colors.primary,
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
   playerLevel: {
     fontSize: 15,
@@ -289,7 +291,7 @@ const styles = StyleSheet.create({
   },
   scoreText: {
     fontSize: 18,
-    fontWeight: '800',
+    fontWeight: '600',
     color: colors.text,
   },
   ellipsisRow: {

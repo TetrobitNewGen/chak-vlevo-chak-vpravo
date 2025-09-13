@@ -51,7 +51,7 @@ export default function LanguageScreen() {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name="arrow-back" size={24} color={colors.white} />
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Выбор языка</Text>
         <View style={styles.headerRight} />
@@ -118,20 +118,22 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
   },
   header: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.white,
     paddingHorizontal: 20,
     paddingVertical: 15,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
   },
   backButton: {
     padding: 5,
   },
   headerTitle: {
-    color: colors.white,
+    color: colors.text,
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
   headerRight: {
     width: 34, // Для симметрии
@@ -146,7 +148,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontWeight: '800',
+    fontWeight: '600',
     color: colors.text,
     marginBottom: 8,
   },
@@ -160,13 +162,13 @@ const styles = StyleSheet.create({
   },
   languageCard: {
     backgroundColor: colors.white,
-    borderRadius: 16,
+    borderRadius: 20,
     marginBottom: 15,
     shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
     borderWidth: 2,
     borderColor: '#F0F0F0',
   },
@@ -198,7 +200,7 @@ const styles = StyleSheet.create({
   },
   languageName: {
     fontSize: 20,
-    fontWeight: '700',
+    fontWeight: '600',
     color: colors.text,
     marginBottom: 4,
   },
@@ -218,18 +220,18 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     backgroundColor: colors.primary,
-    borderRadius: 16,
+    borderRadius: 20,
     paddingVertical: 18,
     alignItems: 'center',
     shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
+    shadowRadius: 12,
+    elevation: 8,
   },
   saveButtonText: {
     color: colors.white,
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: '600',
   },
 });

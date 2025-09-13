@@ -8,6 +8,7 @@ import {
   Dimensions,
   Animated,
 } from 'react-native';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,6 +16,7 @@ import { useNavigation } from '@react-navigation/native';
 import { colors } from '../utils/colors';
 import { WordCard, GameState, User } from '../types';
 import { LinearGradient } from 'expo-linear-gradient';
+import { userStore } from '../utils/userStore';
 
 const { width, height } = Dimensions.get('window');
 
@@ -53,7 +55,7 @@ const mockCards: WordCard[] = [
   { id: '30', tatarWord: 'Йорт', russianWord: 'Школа', isCorrect: false, difficulty: 'medium' },
 ];
 
-const mockUser: User = {
+const defaultUser: User = {
   id: '1',
   name: 'Йенифер',
   level: 10,
@@ -81,6 +83,7 @@ export default function GameScreen() {
     isGameOver: false,
   });
   const [mascotImage, setMascotImage] = useState<'think' | 'good' | 'fail'>('think');
+  const [user, setUser] = useState<User>(defaultUser);
 
   const translateX = useRef(new Animated.Value(0)).current;
   const rotate = useRef(new Animated.Value(0)).current;
@@ -89,6 +92,13 @@ export default function GameScreen() {
 
   const currentCard = shuffledCards[gameState.currentCardIndex];
   
+  // Подписываемся на изменения в глобальном хранилище
+  useEffect(() => {
+    const unsubscribe = userStore.subscribe(() => {
+      setUser(prev => ({ ...prev, name: userStore.getUserName() }));
+    });
+    return unsubscribe;
+  }, []);
 
   // Сброс анимации при смене карточки
   useEffect(() => {
@@ -301,15 +311,20 @@ export default function GameScreen() {
         
         <View style={styles.userInfo}>
           <View style={styles.userTextInfo}>
-            <Text style={styles.userLevel}>Уровень {mockUser.level}</Text>
+            <Text style={styles.userLevel}>Уровень {user.level}</Text>
             <Text style={styles.userHint}>10 xp до нового уровня!</Text>
           </View>
 
-          <LinearGradient colors={['#FFF176', '#FF9800', '#5D08B8']} locations={[0, 0.3, 1]} style={styles.avatarContainer}>
-            <View style={styles.avatarPlaceholder}>
-              <Image source={require('../../assets/ava2.jpg')} style={styles.chakChakAvatar} />
-            </View>
-          </LinearGradient>
+          <TouchableOpacity 
+            onPress={() => navigation.navigate('Profile' as never)}
+            style={styles.avatarButton}
+          >
+            <LinearGradient colors={['#FFF176', '#FF9800', '#5D08B8']} locations={[0, 0.3, 1]} style={styles.avatarContainer}>
+              <View style={styles.avatarPlaceholder}>
+                <Image source={require('../../assets/ava2.jpg')} style={styles.chakChakAvatar} />
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -420,8 +435,10 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     flex: 1,
   },
-  avatarContainer: {
+  avatarButton: {
     marginLeft: 15,
+  },
+  avatarContainer: {
     borderRadius: 30,
     padding: 7,
   },

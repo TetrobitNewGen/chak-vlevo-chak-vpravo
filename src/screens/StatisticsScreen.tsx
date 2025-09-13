@@ -37,7 +37,7 @@ export default function StatisticsScreen() {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name="arrow-back" size={24} color={colors.white} />
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Статистика</Text>
         <View style={styles.headerRight} />
@@ -120,20 +120,22 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
   },
   header: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.white,
     paddingHorizontal: 20,
     paddingVertical: 15,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
   },
   backButton: {
     padding: 5,
   },
   headerTitle: {
-    color: colors.white,
+    color: colors.text,
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
   headerRight: {
     width: 34, // Для симметрии
@@ -159,7 +161,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: '600',
     color: colors.text,
   },
   streakContainer: {
@@ -170,14 +172,14 @@ const styles = StyleSheet.create({
   },
   streakCard: {
     backgroundColor: colors.white,
-    borderRadius: 15,
+    borderRadius: 20,
     padding: 20,
     alignItems: 'center',
     shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
     flex: 1,
     marginHorizontal: 5,
   },
@@ -198,7 +200,7 @@ const styles = StyleSheet.create({
   },
   streakValue: {
     fontSize: 32,
-    fontWeight: 'bold',
+    fontWeight: '600',
     color: colors.text,
     marginBottom: 4,
   },
@@ -212,14 +214,14 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 20,
     padding: 20,
-    borderRadius: 15,
+    borderRadius: 20,
     flexDirection: 'row',
     alignItems: 'center',
     shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
     borderLeftWidth: 4,
     borderLeftColor: colors.primary,
   },
@@ -244,14 +246,14 @@ const styles = StyleSheet.create({
   },
   statItem: {
     backgroundColor: colors.white,
-    borderRadius: 12,
+    borderRadius: 20,
     padding: 15,
     alignItems: 'center',
     shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
     flex: 1,
     marginHorizontal: 5,
   },
@@ -264,7 +266,7 @@ const styles = StyleSheet.create({
   },
   statItemValue: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '600',
     color: colors.text,
     textAlign: 'center',
   },
