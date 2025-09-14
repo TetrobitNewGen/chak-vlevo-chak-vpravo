@@ -16,7 +16,6 @@ import { launchImageLibrary, ImagePickerResponse, MediaType } from 'react-native
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { Audio } from 'expo-av';
 import { colors } from '../utils/colors';
 import { userStore } from '../utils/userStore';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -43,24 +42,6 @@ export default function SettingsScreen() {
     loadSkin();
   }, []);
 
-  // Функция для воспроизведения звука тапа
-  const playTapSound = async () => {
-    try {
-      const { sound } = await Audio.Sound.createAsync(
-        require('../../assets/tap-resonant.aif')
-      );
-      await sound.playAsync();
-      // Освобождаем ресурсы после воспроизведения
-      sound.setOnPlaybackStatusUpdate((status: any) => {
-        if (status.isLoaded && status.didJustFinish) {
-          sound.unloadAsync();
-        }
-      });
-    } catch (error) {
-      console.log('Ошибка воспроизведения звука:', error);
-    }
-  };
-
   // Подписываемся на изменения в глобальном хранилище
   useEffect(() => {
     const unsubscribe = userStore.subscribe(() => {
@@ -82,25 +63,21 @@ export default function SettingsScreen() {
   };
 
   const handleSkinChange = () => {
-    playTapSound();
     const newSkin = currentSkin === 'default' ? 'cat' : 'default';
     userStore.setMascotSkin(newSkin);
   };
 
   const handleEditProfile = () => {
-    playTapSound();
     setShowEditModal(true);
   };
 
   const handleChangeName = () => {
-    playTapSound();
     setNewName(userName);
     setShowEditModal(false);
     setShowNameModal(true);
   };
 
   const handleNameChange = () => {
-    playTapSound();
     if (newName.trim()) {
       const trimmedName = newName.trim();
       userStore.setUserName(trimmedName);
@@ -110,7 +87,6 @@ export default function SettingsScreen() {
   };
 
   const handleChangeAvatar = () => {
-    playTapSound();
     setShowEditModal(false);
     setShowPhotoModal(true);
   };
@@ -139,7 +115,6 @@ export default function SettingsScreen() {
   };
 
   const confirmPhotoChange = () => {
-    playTapSound();
     if (selectedPhoto) {
       setUserAvatar({ uri: selectedPhoto });
       userStore.setUserAvatar(selectedPhoto);
@@ -150,28 +125,23 @@ export default function SettingsScreen() {
   };
 
   const cancelPhotoChange = () => {
-    playTapSound();
     setSelectedPhoto(null);
     setShowPhotoModal(false);
   };
 
   const handleChangeDifficulty = () => {
-    playTapSound();
     Alert.alert('Сложность', 'Выберите уровень сложности', [
       { text: 'Легкий', onPress: () => {
-          playTapSound();
           setDifficulty('easy');
           userStore.setDifficulty('easy');
         }
       },
       { text: 'Средний', onPress: () => {
-          playTapSound();
           setDifficulty('medium');
           userStore.setDifficulty('medium');
         }
       },
       { text: 'Сложный', onPress: () => {
-          playTapSound();
           setDifficulty('hard');
           userStore.setDifficulty('hard');
         }
@@ -181,17 +151,12 @@ export default function SettingsScreen() {
   };
 
   const handleResetProgress = () => {
-    playTapSound();
     Alert.alert(
       'Сброс прогресса',
       'Вы уверены, что хотите сбросить весь прогресс? Это действие нельзя отменить.',
       [
         { text: 'Отмена', style: 'cancel' },
-        { text: 'Сбросить', style: 'destructive', onPress: () => {
-            playTapSound();
-            console.log('Прогресс сброшен');
-          }
-        },
+        { text: 'Сбросить', style: 'destructive', onPress: () => console.log('Прогресс сброшен') },
       ]
     );
   };
@@ -216,20 +181,14 @@ export default function SettingsScreen() {
       icon: 'volume-high-outline',
       label: 'Звук',
       value: soundEnabled ? 'Включен' : 'Выключен',
-      onPress: () => {
-        playTapSound();
-        setSoundEnabled(!soundEnabled);
-      },
+      onPress: () => setSoundEnabled(!soundEnabled),
     },
     {
       id: '4',
       icon: 'phone-portrait-outline',
       label: 'Вибрация',
       value: vibrationEnabled ? 'Включена' : 'Выключена',
-      onPress: () => {
-        playTapSound();
-        setVibrationEnabled(!vibrationEnabled);
-      },
+      onPress: () => setVibrationEnabled(!vibrationEnabled),
     },
     {
       id: '5',
@@ -244,30 +203,21 @@ export default function SettingsScreen() {
       icon: 'help-circle-outline',
       label: 'Правила игры',
       value: 'Как играть',
-      onPress: () => {
-        playTapSound();
-        console.log('Правила игры');
-      },
+      onPress: () => console.log('Правила игры'),
     },
     {
       id: '7',
       icon: 'information-circle-outline',
       label: 'О приложении',
       value: 'Версия 1.0.0',
-      onPress: () => {
-        playTapSound();
-        console.log('О приложении');
-      },
+      onPress: () => console.log('О приложении'),
     },
     {
       id: '8',
       icon: 'star-outline',
       label: 'Оценить приложение',
       value: 'В App Store',
-      onPress: () => {
-        playTapSound();
-        console.log('Оценить приложение');
-      },
+      onPress: () => console.log('Оценить приложение'),
     },
     {
       id: '9',
@@ -280,6 +230,17 @@ export default function SettingsScreen() {
 
   return (
     <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Настройки</Text>
+        <View style={styles.headerRight} />
+      </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
 
@@ -338,10 +299,7 @@ export default function SettingsScreen() {
 
             <TouchableOpacity 
               style={styles.cancelButton}
-              onPress={() => {
-                playTapSound();
-                setShowEditModal(false);
-              }}
+              onPress={() => setShowEditModal(false)}
             >
               <Text style={styles.cancelButtonText}>Отмена</Text>
             </TouchableOpacity>
@@ -379,10 +337,7 @@ export default function SettingsScreen() {
 
             <TouchableOpacity 
               style={styles.cancelButton}
-              onPress={() => {
-                playTapSound();
-                setShowNameModal(false);
-              }}
+              onPress={() => setShowNameModal(false)}
             >
               <Text style={styles.cancelButtonText}>Отмена</Text>
             </TouchableOpacity>
@@ -415,10 +370,7 @@ export default function SettingsScreen() {
 
             <TouchableOpacity 
               style={styles.modalButton}
-              onPress={() => {
-                playTapSound();
-                openImagePicker();
-              }}
+              onPress={openImagePicker}
             >
               <Ionicons name="images-outline" size={24} color={colors.primary} />
               <Text style={styles.modalButtonText}>
@@ -452,14 +404,42 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.background,
+  },
+  header: {
     backgroundColor: colors.white,
+    paddingHorizontal: 20,
+    paddingVertical: 4,
+    paddingTop: 50,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginHorizontal: 20,
+    marginTop: 10,
+    borderRadius: 15,
+    shadowColor: colors.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  backButton: {
+    padding: 5,
+  },
+  headerTitle: {
+    color: colors.text,
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  headerRight: {
+    width: 34, // Для симметрии
   },
   content: {
     flex: 1,
   },
   cardsContainer: {
     paddingHorizontal: 20,
-    paddingTop: 50,
+    paddingTop: 20,
     paddingBottom: 20,
     flexDirection: 'row',
     flexWrap: 'wrap',
