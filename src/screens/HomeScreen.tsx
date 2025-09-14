@@ -244,6 +244,9 @@ export default function GameScreen() {
             {
               transform: [
                 { translateX },
+                {
+                  translateY: 20,
+                },
                 { 
                   rotate: rotate.interpolate({
                     inputRange: [-1, 1],
@@ -257,19 +260,18 @@ export default function GameScreen() {
           ]}
         >
           <Text style={styles.questionText}>Верный ли перевод?</Text>
-          <Text style={styles.hintText}>Хмммм</Text>
           
           <View style={styles.wordContainer}>
-            <Text style={styles.languageLabel}>татарский:</Text>
-            <Text style={styles.tatarWord}>{currentCard.tatarWord}</Text>
+            <Text style={styles.hintText}>татарча</Text>
+            <Text style={styles.tatarWord}>«{currentCard.tatarWord}»</Text>
           </View>
 
           <View style={styles.arrowContainer}>
-            <Ionicons name="swap-vertical" size={24} color={colors.gray} />
+            <Image source={require('../../assets/arrows.jpg')} style={styles.arrow} width={205} height={100} />
           </View>
 
           <View style={styles.wordContainer}>
-            <Text style={styles.languageLabel}>русский:</Text>
+            <Text style={styles.hintText}>по русски</Text>
             <Text style={styles.russianWord}>{currentCard.russianWord}</Text>
           </View>
         </Animated.View>
@@ -355,6 +357,10 @@ export default function GameScreen() {
 }
 
 const styles = StyleSheet.create({
+  arrow: {
+    width: 300,
+    height: 100,
+  },
   container: {
     flex: 1,
     backgroundColor: '#fff', // Светло-желтый фон как на фото
@@ -484,38 +490,36 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   questionText: {
-    fontSize: 16,
-    color: colors.gray,
-    textAlign: 'center',
+    fontSize: 18,
+    color: colors.black,
+    fontWeight: 'bold',
+    textAlign: 'left',
     marginBottom: 5,
   },
   hintText: {
     fontSize: 14,
     color: colors.gray,
-    textAlign: 'center',
-    fontStyle: 'italic',
-    marginBottom: 30,
+    textAlign: 'left',
+    fontStyle: 'normal',
   },
   wordContainer: {
-    alignItems: 'center',
     marginVertical: 15,
   },
   languageLabel: {
     fontSize: 14,
     color: colors.gray,
-    marginBottom: 8,
   },
   tatarWord: {
     fontSize: 28,
     fontWeight: 'bold',
     color: colors.text,
-    textAlign: 'center',
+    textAlign: 'left',
   },
   russianWord: {
     fontSize: 28,
     fontWeight: 'bold',
     color: colors.text,
-    textAlign: 'center',
+    textAlign: 'left',
   },
   arrowContainer: {
     alignItems: 'center',
@@ -596,11 +600,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     paddingHorizontal: 40,
-    paddingVertical: 30,
+    paddingVertical: 20,
   },
   actionButton: {
-    width: 70,
-    height: 70,
+    marginTop: 20,
+    width: 65,
+    height: 65,
     borderRadius: 35,
     justifyContent: 'center',
     alignItems: 'center',
