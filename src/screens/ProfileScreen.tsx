@@ -193,16 +193,15 @@ export default function ProfileScreen() {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Profile Section */}
          <View style={styles.profileSection}>
-           <LinearGradient colors={['#FFF176', '#FF9800', '#5D08B8']} locations={[0, 0.3, 1]} style={styles.avatarContainer}>
+           {/* <LinearGradient colors={['#FFF176', '#FF9800', '#5D08B8']} locations={[0, 0.3, 1]} style={styles.avatarContainer}> */}
              <View style={styles.avatarPlaceholder}>
                <Image source={userAvatar} style={styles.profileAvatar} />
              </View>
-           </LinearGradient>
+           {/* </LinearGradient> */}
           <Text style={styles.profileName}>{userName}</Text>
           <Text style={styles.profileLevel}>Уровень 10</Text>
-          <Text style={styles.profileHint}>10 xp до нового уровня!</Text>
         </View>
-
+        <Text style={styles.title}>Меню </Text>
         {/* Cards Grid */}
         <View style={styles.cardsContainer}>
           {profileCards.map((card) => (
@@ -214,8 +213,11 @@ export default function ProfileScreen() {
               <View style={styles.cardIcon}>
                 <Ionicons name={card.icon as any} size={24} color={colors.primary} />
               </View>
+              <View>
+
               <Text style={styles.cardLabel}>{card.label}</Text>
               <Text style={styles.cardValue}>{card.value}</Text>
+              </View>
             </TouchableOpacity>
           ))}
         </View>
@@ -359,6 +361,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.white,
   },
+  title:{
+    paddingVertical: 10,
+    fontWeight: 600,
+    paddingHorizontal: 30,
+    fontSize:32,
+  },
   header: {
     backgroundColor: colors.white,
     paddingHorizontal: 20,
@@ -386,42 +394,29 @@ const styles = StyleSheet.create({
   profileSection: {
     alignItems: 'center',
     paddingVertical: 40,
+    paddingBottom: 10,
     backgroundColor: colors.white,
   },
   avatarContainer: {
-    borderRadius: 50,
-    padding: 8,
-    marginBottom: 20,
+    borderRadius: 1000,
+    marginBottom: 10,
   },
-  avatarPlaceholder: {
+ 
+  profileAvatar: {
     width: 100,
     height: 100,
-    borderRadius: 50,
-    backgroundColor: colors.white,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  profileAvatar: {
-    width: 80,
-    height: 80,
     borderRadius: 40,
   },
   profileName: {
-    fontSize: 24,
+    paddingTop: 10,
+    fontSize: 14,
     fontWeight: 'bold',
     color: colors.text,
-    marginBottom: 8,
   },
   profileLevel: {
-    fontSize: 18,
+    fontSize: 10,
     color: '#32D392',
-    fontWeight: '600',
-    marginBottom: 4,
+    fontWeight: '400',
   },
   profileHint: {
     color: '#8B8B8B',
@@ -436,33 +431,32 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   card: {
+    display: 'flex',
+    flexDirection: 'row',
+    gap: 10,
+    alignItems: 'center',
+    alignContent: 'flex-start',
     backgroundColor: colors.white,
     borderRadius: 20,
-    padding: 20,
-    marginBottom: 15,
-    shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 8,
-    width: (width - 60) / 2, // Ширина для 2 карточек в ряду
-    alignItems: 'center',
+    padding: 10,
+    marginBottom: 5,
+    borderBottomColor: '#EBEBEB',
+    borderBottomWidth: 1,
+    width: width - 60, // Ширина для 2 карточек в ряду
   },
   cardIcon: {
-    marginBottom: 12,
+    // marginBottom: 12,
   },
   cardLabel: {
-    fontSize: 14,
+    fontSize: 10,
     color: colors.gray,
-    marginBottom: 8,
-    textAlign: 'center',
-    fontWeight: '500',
+    // marginBottom: 8,
+    fontWeight: '300',
   },
   cardValue: {
     fontSize: 16,
     fontWeight: '600',
     color: colors.text,
-    textAlign: 'center',
   },
   modalOverlay: {
     flex: 1,

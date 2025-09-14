@@ -27,13 +27,15 @@ const mockCards: WordCard[] = [
   { id: '2', tatarWord: 'Кош', russianWord: 'Птица', isCorrect: true, difficulty: 'easy' },
   { id: '3', tatarWord: 'Су', russianWord: 'Вода', isCorrect: true, difficulty: 'easy' },
   { id: '4', tatarWord: 'Ат', russianWord: 'Лошадь', isCorrect: true, difficulty: 'medium' },
+
   { id: '5', tatarWord: 'Кит', russianWord: 'Рыба', isCorrect: false, difficulty: 'medium' },
+
   { id: '6', tatarWord: 'Йорт', russianWord: 'Дом', isCorrect: true, difficulty: 'medium' },
   { id: '7', tatarWord: 'Күз', russianWord: 'Глаз', isCorrect: true, difficulty: 'hard' },
   { id: '8', tatarWord: 'Кул', russianWord: 'Рука', isCorrect: true, difficulty: 'hard' },
   { id: '9', tatarWord: 'Аяк', russianWord: 'Нога', isCorrect: true, difficulty: 'easy' },
   { id: '10', tatarWord: 'Баш', russianWord: 'Голова', isCorrect: true, difficulty: 'easy' },
-  { id: '11', tatarWord: 'Күңел', russianWord: 'Сердце', isCorrect: true, difficulty: 'medium' },
+  { id: '11', tatarWord: 'Йөрәк', russianWord: 'Сердце', isCorrect: true, difficulty: 'medium' },
   { id: '12', tatarWord: 'Күк', russianWord: 'Небо', isCorrect: true, difficulty: 'easy' },
   { id: '13', tatarWord: 'Җир', russianWord: 'Земля', isCorrect: true, difficulty: 'medium' },
   { id: '14', tatarWord: 'Кояш', russianWord: 'Солнце', isCorrect: true, difficulty: 'medium' },
@@ -47,7 +49,7 @@ const mockCards: WordCard[] = [
   { id: '22', tatarWord: 'Сыер', russianWord: 'Корова', isCorrect: true, difficulty: 'medium' },
   { id: '23', tatarWord: 'Куян', russianWord: 'Заяц', isCorrect: true, difficulty: 'medium' },
   { id: '24', tatarWord: 'Аю', russianWord: 'Медведь', isCorrect: true, difficulty: 'hard' },
-  { id: '25', tatarWord: 'Кыргый', russianWord: 'Волк', isCorrect: true, difficulty: 'hard' },
+  { id: '25', tatarWord: 'Бүре', russianWord: 'Волк', isCorrect: true, difficulty: 'hard' },
   // Неправильные переводы для усложнения
   { id: '26', tatarWord: 'Алма', russianWord: 'Груша', isCorrect: false, difficulty: 'easy' },
   { id: '27', tatarWord: 'Кош', russianWord: 'Рыба', isCorrect: false, difficulty: 'easy' },
@@ -288,6 +290,7 @@ export default function GameScreen() {
           </View>
         </Animated.View>
       </PanGestureHandler>
+      
     );
   };
 
@@ -582,18 +585,21 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   gameOverContainer: {
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    height: height - 200, 
+    width: width - 40,
+    borderRadius: 20,
+    backgroundColor: '#fff',
     padding: 40,
   },
   gameOverText: {
-    fontSize: 24,
+    fontSize: 32,
     fontWeight: 'bold',
     color: colors.text,
-    marginBottom: 20,
-    textAlign: 'center',
+    marginBottom: 10,
   },
   gameOverScoreText: {
-    fontSize: 18,
+    fontSize: 14,
     color: colors.gray,
     marginBottom: 30,
   },
@@ -602,6 +608,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     paddingVertical: 15,
     borderRadius: 25,
+
   },
   restartButtonText: {
     color: colors.white,
