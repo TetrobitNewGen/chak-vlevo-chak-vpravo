@@ -9,7 +9,7 @@ import {
   Animated,
   ImageBackground,
 } from 'react-native';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -87,6 +87,7 @@ export default function GameScreen() {
   });
   const [mascotImage, setMascotImage] = useState<'think' | 'good' | 'fail'>('think');
   const [user, setUser] = useState<User>(defaultUser);
+  const [currentSkin, setCurrentSkin] = useState<'default' | 'cat'>(userStore.getMascotSkin() as 'default' | 'cat');
 
   const translateX = useRef(new Animated.Value(0)).current;
   const rotate = useRef(new Animated.Value(0)).current;
@@ -95,13 +96,24 @@ export default function GameScreen() {
 
   const currentCard = shuffledCards[gameState.currentCardIndex];
   
+  // Загружаем скин при запуске
+  useEffect(() => {
+    loadSkin();
+  }, []);
+
   // Подписываемся на изменения в глобальном хранилище
   useEffect(() => {
     const unsubscribe = userStore.subscribe(() => {
       setUser(prev => ({ ...prev, name: userStore.getUserName() }));
+      setCurrentSkin(userStore.getMascotSkin() as 'default' | 'cat');
     });
     return unsubscribe;
   }, []);
+
+  const loadSkin = async () => {
+    await userStore.loadMascotSkinFromStorage();
+    setCurrentSkin(userStore.getMascotSkin() as 'default' | 'cat');
+  };
 
   // Сброс анимации при смене карточки
   useEffect(() => {
@@ -257,6 +269,9 @@ export default function GameScreen() {
             {
               transform: [
                 { translateX },
+                {
+                  translateY: 20,
+                },
                 { 
                   rotate: rotate.interpolate({
                     inputRange: [-1, 1],
@@ -295,13 +310,24 @@ export default function GameScreen() {
   };
 
   const getMascotImage = () => {
-    switch (mascotImage) {
-      case 'good':
-        return require('../../assets/chak-good.png');
-      case 'fail':
-        return require('../../assets/chak-fail.png');
-      default:
-        return require('../../assets/chak-think.png');
+    if (currentSkin === 'cat') {
+      switch (mascotImage) {
+        case 'good':
+          return require('../../assets/cat-good.png');
+        case 'fail':
+          return require('../../assets/cat-fail.png');
+        default:
+          return require('../../assets/cat-think.png');
+      }
+    } else {
+      switch (mascotImage) {
+        case 'good':
+          return require('../../assets/chak-good.png');
+        case 'fail':
+          return require('../../assets/chak-fail.png');
+        default:
+          return require('../../assets/chak-think.png');
+      }
     }
   };
 
@@ -385,6 +411,10 @@ export default function GameScreen() {
 }
 
 const styles = StyleSheet.create({
+  arrow: {
+    width: 300,
+    height: 100,
+  },
   container: {
     backgroundColor: '#fff', // Светло-желтый фон как на фото
   },
@@ -621,20 +651,17 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     flexDirection: 'row',
     justifyContent: 'space-around',
-    // paddingHorizontal: 40,
+
     paddingVertical: 20,
   },
   actionButton: {
-    width: 70,
-    height: 70,
+    marginTop: 20,
+    width: 65,
+    height: 65,
     borderRadius: 35,
     justifyContent: 'center',
     alignItems: 'center',
-    // shadowColor: colors.black,
-    // shadowOffset: { width: 0, height: 4 },
-    // shadowOpacity: 0.3,
-    // shadowRadius: 6,
-    // elevation: 6,
+
   },
   wrongButton: {
     backgroundColor: '#FFBC8D',
