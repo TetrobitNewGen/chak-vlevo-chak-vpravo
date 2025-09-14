@@ -13,15 +13,20 @@ import {
   Dimensions,
 } from 'react-native';
 import { launchImageLibrary, ImagePickerResponse, MediaType } from 'react-native-image-picker';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import { colors } from '../utils/colors';
 import { userStore } from '../utils/userStore';
+import { LinearGradient } from 'expo-linear-gradient';
+
+const { width } = Dimensions.get('window');
 
 export default function SettingsScreen() {
+  const navigation = useNavigation();
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [vibrationEnabled, setVibrationEnabled] = useState(true);
-  const [difficulty, setDifficulty] = useState('medium');
+  const [difficulty, setDifficulty] = useState(userStore.getDifficulty());
   const [userAvatar, setUserAvatar] = useState(require('../../assets/ava2.jpg'));
   const [userName, setUserName] = useState(userStore.getUserName());
   const [showEditModal, setShowEditModal] = useState(false);
@@ -29,14 +34,38 @@ export default function SettingsScreen() {
   const [showPhotoModal, setShowPhotoModal] = useState(false);
   const [newName, setNewName] = useState('');
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+  const [currentSkin, setCurrentSkin] = useState(userStore.getMascotSkin());
+
+  // Загружаем сохраненную сложность и скин при запуске
+  useEffect(() => {
+    loadDifficulty();
+    loadSkin();
+  }, []);
 
   // Подписываемся на изменения в глобальном хранилище
   useEffect(() => {
     const unsubscribe = userStore.subscribe(() => {
       setUserName(userStore.getUserName());
+      setDifficulty(userStore.getDifficulty());
+      setCurrentSkin(userStore.getMascotSkin());
     });
     return unsubscribe;
   }, []);
+
+  const loadDifficulty = async () => {
+    await userStore.loadDifficultyFromStorage();
+    setDifficulty(userStore.getDifficulty());
+  };
+
+  const loadSkin = async () => {
+    await userStore.loadMascotSkinFromStorage();
+    setCurrentSkin(userStore.getMascotSkin());
+  };
+
+  const handleSkinChange = () => {
+    const newSkin = currentSkin === 'default' ? 'cat' : 'default';
+    userStore.setMascotSkin(newSkin);
+  };
 
   const handleEditProfile = () => {
     setShowEditModal(true);
@@ -102,9 +131,21 @@ export default function SettingsScreen() {
 
   const handleChangeDifficulty = () => {
     Alert.alert('Сложность', 'Выберите уровень сложности', [
-      { text: 'Легкий', onPress: () => setDifficulty('easy') },
-      { text: 'Средний', onPress: () => setDifficulty('medium') },
-      { text: 'Сложный', onPress: () => setDifficulty('hard') },
+      { text: 'Легкий', onPress: () => {
+          setDifficulty('easy');
+          userStore.setDifficulty('easy');
+        }
+      },
+      { text: 'Средний', onPress: () => {
+          setDifficulty('medium');
+          userStore.setDifficulty('medium');
+        }
+      },
+      { text: 'Сложный', onPress: () => {
+          setDifficulty('hard');
+          userStore.setDifficulty('hard');
+        }
+      },
       { text: 'Отмена', style: 'cancel' },
     ]);
   };
@@ -120,122 +161,112 @@ export default function SettingsScreen() {
     );
   };
 
+  const settingsCards = [
+    {
+      id: '1',
+      icon: 'create-outline',
+      label: 'Редактировать профиль',
+      value: 'Имя и фото',
+      onPress: handleEditProfile,
+    },
+    {
+      id: '2',
+      icon: 'trending-up-outline',
+      label: 'Сложность',
+      value: difficulty === 'easy' ? 'Легкий' : difficulty === 'medium' ? 'Средний' : 'Сложный',
+      onPress: handleChangeDifficulty,
+    },
+    {
+      id: '3',
+      icon: 'volume-high-outline',
+      label: 'Звук',
+      value: soundEnabled ? 'Включен' : 'Выключен',
+      onPress: () => setSoundEnabled(!soundEnabled),
+    },
+    {
+      id: '4',
+      icon: 'phone-portrait-outline',
+      label: 'Вибрация',
+      value: vibrationEnabled ? 'Включена' : 'Выключена',
+      onPress: () => setVibrationEnabled(!vibrationEnabled),
+    },
+    {
+      id: '5',
+      icon: 'refresh-outline',
+      label: 'Сбросить прогресс',
+      value: 'Осторожно!',
+      onPress: handleResetProgress,
+      isDanger: true,
+    },
+    {
+      id: '6',
+      icon: 'help-circle-outline',
+      label: 'Правила игры',
+      value: 'Как играть',
+      onPress: () => console.log('Правила игры'),
+    },
+    {
+      id: '7',
+      icon: 'information-circle-outline',
+      label: 'О приложении',
+      value: 'Версия 1.0.0',
+      onPress: () => console.log('О приложении'),
+    },
+    {
+      id: '8',
+      icon: 'star-outline',
+      label: 'Оценить приложение',
+      value: 'В App Store',
+      onPress: () => console.log('Оценить приложение'),
+    },
+    {
+      id: '9',
+      icon: 'color-palette-outline',
+      label: 'Скины',
+      value: currentSkin === 'default' ? 'Оригинал' : 'Кот',
+      onPress: handleSkinChange,
+    },
+  ];
+
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Настройки</Text>
+        <View style={styles.headerRight} />
+      </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Profile Section */}
-        <View style={styles.profileSection}>
-          <TouchableOpacity onPress={handleEditProfile}>
-            <Image
-              source={userAvatar}
-              style={styles.profileAvatar}
-            />
-            <View style={styles.editAvatarButton}>
-              <Ionicons name="camera" size={16} color={colors.white} />
-            </View>
-          </TouchableOpacity>
-          <Text style={styles.profileName}>{userName}</Text>
-          <Text style={styles.profileLevel}>10 уровень</Text>
-        </View>
 
-        {/* Game Settings */}
-        <View style={styles.settingsContainer}>
-          <Text style={styles.sectionTitle}>Игровые настройки</Text>
-          
-          <TouchableOpacity style={styles.settingItem} onPress={handleEditProfile}>
-            <View style={styles.settingLeft}>
-              <Ionicons name="create-outline" size={24} color={colors.primary} />
-              <Text style={styles.settingText}>Редактировать профиль</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color={colors.gray} />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.settingItem} onPress={handleChangeDifficulty}>
-            <View style={styles.settingLeft}>
-              <Ionicons name="trending-up-outline" size={24} color={colors.primary} />
-              <Text style={styles.settingText}>Сложность: {difficulty === 'easy' ? 'Легкий' : difficulty === 'medium' ? 'Средний' : 'Сложный'}</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color={colors.gray} />
-          </TouchableOpacity>
-        </View>
-
-        {/* Audio & Vibration */}
-        <View style={styles.settingsContainer}>
-          <Text style={styles.sectionTitle}>Звук и вибрация</Text>
-          
-          <View style={styles.settingItem}>
-            <View style={styles.settingLeft}>
-              <Ionicons name="volume-high-outline" size={24} color={colors.primary} />
-              <Text style={styles.settingText}>Звук</Text>
-            </View>
-            <Switch
-              value={soundEnabled}
-              onValueChange={setSoundEnabled}
-              trackColor={{ false: colors.lightGray, true: colors.primaryLight }}
-              thumbColor={soundEnabled ? colors.white : colors.gray}
-            />
-          </View>
-
-          <View style={styles.settingItem}>
-            <View style={styles.settingLeft}>
-              <Ionicons name="phone-portrait-outline" size={24} color={colors.primary} />
-              <Text style={styles.settingText}>Вибрация</Text>
-            </View>
-            <Switch
-              value={vibrationEnabled}
-              onValueChange={setVibrationEnabled}
-              trackColor={{ false: colors.lightGray, true: colors.primaryLight }}
-              thumbColor={vibrationEnabled ? colors.white : colors.gray}
-            />
-          </View>
-        </View>
-
-        {/* Progress */}
-        <View style={styles.settingsContainer}>
-          <Text style={styles.sectionTitle}>Прогресс</Text>
-          
-          <TouchableOpacity style={styles.settingItem} onPress={handleResetProgress}>
-            <View style={styles.settingLeft}>
-              <Ionicons name="refresh-outline" size={24} color={colors.error} />
-              <Text style={[styles.settingText, { color: colors.error }]}>Сбросить прогресс</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color={colors.gray} />
-          </TouchableOpacity>
-        </View>
-
-        {/* App Info */}
-        <View style={styles.settingsContainer}>
-          <Text style={styles.sectionTitle}>О приложении</Text>
-          
-          <TouchableOpacity style={styles.settingItem}>
-            <View style={styles.settingLeft}>
-              <Ionicons name="help-circle-outline" size={24} color={colors.primary} />
-              <Text style={styles.settingText}>Правила игры</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color={colors.gray} />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.settingItem}>
-            <View style={styles.settingLeft}>
-              <Ionicons name="information-circle-outline" size={24} color={colors.primary} />
-              <Text style={styles.settingText}>О приложении</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color={colors.gray} />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.settingItem}>
-            <View style={styles.settingLeft}>
-              <Ionicons name="star-outline" size={24} color={colors.primary} />
-              <Text style={styles.settingText}>Оценить приложение</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color={colors.gray} />
-          </TouchableOpacity>
-        </View>
-
-        {/* App Version */}
-        <View style={styles.versionContainer}>
-          <Text style={styles.versionText}>Версия 1.0.0</Text>
+        {/* Settings Cards Grid */}
+        <View style={styles.cardsContainer}>
+          {settingsCards.map((card) => (
+            <TouchableOpacity
+              key={card.id}
+              style={[styles.card, card.isDanger && styles.dangerCard]}
+              onPress={card.onPress}
+            >
+              <View style={styles.cardIcon}>
+                <Ionicons 
+                  name={card.icon as any} 
+                  size={24} 
+                  color={card.isDanger ? colors.error : colors.primary} 
+                />
+              </View>
+              <Text style={[styles.cardLabel, card.isDanger && styles.dangerText]}>
+                {card.label}
+              </Text>
+              <Text style={[styles.cardValue, card.isDanger && styles.dangerText]}>
+                {card.value}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
       </ScrollView>
 
@@ -366,7 +397,7 @@ export default function SettingsScreen() {
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -375,134 +406,80 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
+  header: {
+    backgroundColor: colors.white,
+    paddingHorizontal: 20,
+    paddingVertical: 4,
+    paddingTop: 50,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginHorizontal: 20,
+    marginTop: 10,
+    borderRadius: 15,
+    shadowColor: colors.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  backButton: {
+    padding: 5,
+  },
+  headerTitle: {
+    color: colors.text,
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  headerRight: {
+    width: 34, // Для симметрии
+  },
   content: {
     flex: 1,
   },
-  profileSection: {
-    alignItems: 'center',
-    paddingVertical: 30,
-    backgroundColor: colors.white,
-    marginBottom: 20,
-  },
-  profileAvatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    marginBottom: 15,
-  },
-  editAvatarButton: {
-    position: 'absolute',
-    bottom: 10,
-    right: 10,
-    backgroundColor: colors.primary,
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: colors.white,
-  },
-  profileName: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginBottom: 5,
-  },
-  profileLevel: {
-    fontSize: 16,
-    color: colors.secondary,
-    fontWeight: '600',
-  },
-  settingsContainer: {
-    backgroundColor: colors.white,
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.text,
+  cardsContainer: {
     paddingHorizontal: 20,
-    paddingVertical: 15,
-    backgroundColor: colors.background,
-  },
-  settingItem: {
+    paddingTop: 20,
+    paddingBottom: 20,
     flexDirection: 'row',
-    alignItems: 'center',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
   },
-  settingLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  settingText: {
-    fontSize: 16,
-    color: colors.text,
-    marginLeft: 15,
-  },
-  flagIcon: {
-    width: 24,
-    height: 16,
-    borderRadius: 2,
-    overflow: 'hidden',
-    marginLeft: 0,
-  },
-  flagRed: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 5.33,
-    backgroundColor: '#E53E3E',
-  },
-  flagWhite: {
-    position: 'absolute',
-    top: 5.33,
-    left: 0,
-    right: 0,
-    height: 5.33,
+  card: {
     backgroundColor: colors.white,
-  },
-  flagGreen: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 5.33,
-    backgroundColor: '#38A169',
-  },
-  logoutContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 20,
-  },
-  logoutButton: {
-    flexDirection: 'row',
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 15,
+    shadowColor: colors.black,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+    width: (width - 60) / 2, // Ширина для 2 карточек в ряду
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.white,
-    paddingVertical: 15,
-    borderRadius: 10,
+  },
+  dangerCard: {
     borderWidth: 1,
     borderColor: colors.error,
   },
-  logoutText: {
-    fontSize: 16,
-    color: colors.error,
-    marginLeft: 10,
-    fontWeight: '600',
+  cardIcon: {
+    marginBottom: 12,
   },
-  versionContainer: {
-    alignItems: 'center',
-    paddingVertical: 20,
-  },
-  versionText: {
+  cardLabel: {
     fontSize: 14,
     color: colors.gray,
+    marginBottom: 8,
+    textAlign: 'center',
+    fontWeight: '500',
+  },
+  cardValue: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.text,
+    textAlign: 'center',
+  },
+  dangerText: {
+    color: colors.error,
   },
   modalOverlay: {
     flex: 1,
@@ -520,7 +497,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 12,
     elevation: 8,
-    minWidth: Dimensions.get('window').width * 0.8,
+    minWidth: width * 0.8,
   },
   modalTitle: {
     fontSize: 20,
@@ -599,4 +576,3 @@ const styles = StyleSheet.create({
     color: colors.white,
   },
 });
-

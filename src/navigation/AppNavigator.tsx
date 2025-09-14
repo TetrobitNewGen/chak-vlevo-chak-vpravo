@@ -81,15 +81,7 @@ export default function AppNavigator() {
           name="Settings" 
           component={SettingsScreen}
           options={{
-            headerShown: true,
-            title: 'Настройки',
-            headerStyle: {
-              backgroundColor: colors.primary,
-            },
-            headerTintColor: colors.white,
-            headerTitleStyle: {
-              fontWeight: '600',
-            },
+            headerShown: false,
           }}
         />
       </Stack.Navigator>

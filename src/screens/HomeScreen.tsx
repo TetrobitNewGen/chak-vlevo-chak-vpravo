@@ -9,7 +9,7 @@ import {
   Animated,
   ImageBackground,
 } from 'react-native';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -85,6 +85,7 @@ export default function GameScreen() {
   });
   const [mascotImage, setMascotImage] = useState<'think' | 'good' | 'fail'>('think');
   const [user, setUser] = useState<User>(defaultUser);
+  const [currentSkin, setCurrentSkin] = useState<'default' | 'cat'>(userStore.getMascotSkin() as 'default' | 'cat');
 
   const translateX = useRef(new Animated.Value(0)).current;
   const rotate = useRef(new Animated.Value(0)).current;
@@ -93,13 +94,24 @@ export default function GameScreen() {
 
   const currentCard = shuffledCards[gameState.currentCardIndex];
   
+  // Загружаем скин при запуске
+  useEffect(() => {
+    loadSkin();
+  }, []);
+
   // Подписываемся на изменения в глобальном хранилище
   useEffect(() => {
     const unsubscribe = userStore.subscribe(() => {
       setUser(prev => ({ ...prev, name: userStore.getUserName() }));
+      setCurrentSkin(userStore.getMascotSkin() as 'default' | 'cat');
     });
     return unsubscribe;
   }, []);
+
+  const loadSkin = async () => {
+    await userStore.loadMascotSkinFromStorage();
+    setCurrentSkin(userStore.getMascotSkin() as 'default' | 'cat');
+  };
 
   // Сброс анимации при смене карточки
   useEffect(() => {
@@ -255,6 +267,9 @@ export default function GameScreen() {
             {
               transform: [
                 { translateX },
+                {
+                  translateY: 20,
+                },
                 { 
                   rotate: rotate.interpolate({
                     inputRange: [-1, 1],
@@ -268,9 +283,21 @@ export default function GameScreen() {
           ]}
         >
           <Text style={styles.questionText}>Верный ли перевод?</Text>
-          <Text style={styles.hintText}>Хмммм</Text>
           
           <View style={styles.wordContainer}>
+<<<<<<< HEAD
+            <Text style={styles.hintText}>татарча</Text>
+            <Text style={styles.tatarWord}>«{currentCard.tatarWord}»</Text>
+          </View>
+
+          <View style={styles.arrowContainer}>
+            <Image source={require('../../assets/arrows.jpg')} style={styles.arrow} width={205} height={100} />
+          </View>
+
+          <View style={styles.wordContainer}>
+            <Text style={styles.hintText}>по русски</Text>
+            <Text style={styles.russianWord}>{currentCard.russianWord}</Text>
+=======
             <Text style={styles.languageLabel}>татарча:</Text>
             <Text style={styles.Word}>{'«' + currentCard.tatarWord + '»'}</Text>
           </View>
@@ -283,6 +310,7 @@ export default function GameScreen() {
           <View style={styles.wordContainer}>
             <Text style={styles.languageLabel}>по русский:</Text>
             <Text style={styles.Word}>«{currentCard.russianWord}»</Text>
+>>>>>>> master
           </View>
         </Animated.View>
       </PanGestureHandler>
@@ -290,13 +318,24 @@ export default function GameScreen() {
   };
 
   const getMascotImage = () => {
-    switch (mascotImage) {
-      case 'good':
-        return require('../../assets/chak-good.png');
-      case 'fail':
-        return require('../../assets/chak-fail.png');
-      default:
-        return require('../../assets/chak-think.png');
+    if (currentSkin === 'cat') {
+      switch (mascotImage) {
+        case 'good':
+          return require('../../assets/cat-good.png');
+        case 'fail':
+          return require('../../assets/cat-fail.png');
+        default:
+          return require('../../assets/cat-think.png');
+      }
+    } else {
+      switch (mascotImage) {
+        case 'good':
+          return require('../../assets/chak-good.png');
+        case 'fail':
+          return require('../../assets/chak-fail.png');
+        default:
+          return require('../../assets/chak-think.png');
+      }
     }
   };
 
@@ -376,6 +415,10 @@ export default function GameScreen() {
 }
 
 const styles = StyleSheet.create({
+  arrow: {
+    width: 300,
+    height: 100,
+  },
   container: {
     flex: 1,
     
@@ -509,14 +552,27 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   questionText: {
+<<<<<<< HEAD
+    fontSize: 18,
+    color: colors.black,
+    fontWeight: 'bold',
+    textAlign: 'left',
+    marginBottom: 5,
+=======
     fontSize: 16,
     color: colors.black,
     fontWeight: 700,
+>>>>>>> master
   },
   hintText: {
     fontSize: 14,
     color: colors.gray,
+<<<<<<< HEAD
+    textAlign: 'left',
+    fontStyle: 'normal',
+=======
     fontStyle: 'italic',
+>>>>>>> master
   },
   wordContainer: {
     marginVertical: 15,
@@ -530,6 +586,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: colors.text,
     textAlign: 'left',
+<<<<<<< HEAD
+  },
+  russianWord: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: colors.text,
+    textAlign: 'left',
+=======
+>>>>>>> master
   },
   arrowContainer: {
     alignItems: 'center',
@@ -611,12 +676,17 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     flexDirection: 'row',
     justifyContent: 'space-around',
+<<<<<<< HEAD
+    paddingHorizontal: 40,
+=======
     // paddingHorizontal: 40,
+>>>>>>> master
     paddingVertical: 20,
   },
   actionButton: {
-    width: 70,
-    height: 70,
+    marginTop: 20,
+    width: 65,
+    height: 65,
     borderRadius: 35,
     justifyContent: 'center',
     alignItems: 'center',
