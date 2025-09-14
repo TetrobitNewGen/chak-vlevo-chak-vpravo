@@ -267,12 +267,14 @@ export default function GameScreen() {
             },
           ]}
         >
+          <View>
+
           <Text style={styles.questionText}>Верный ли перевод?</Text>
           <Text style={styles.hintText}>Хмммм</Text>
-          
-          <View style={styles.wordContainer}>
-            <Text style={styles.languageLabel}>татарча:</Text>
-            <Text style={styles.Word}>{'«' + currentCard.tatarWord + '»'}</Text>
+            <View style={styles.wordContainer}>
+              <Text style={styles.languageLabel}>татарча:</Text>
+              <Text style={styles.Word}>{'«' + currentCard.tatarWord + '»'}</Text>
+            </View>
           </View>
 
           <View style={styles.arrowContainer}>
@@ -519,7 +521,7 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   wordContainer: {
-    marginVertical: 15,
+    marginVertical: 10,
   },
   languageLabel: {
     fontSize: 14,
