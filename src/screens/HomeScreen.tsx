@@ -345,6 +345,7 @@ export default function GameScreen() {
       </View>
 
       {/* Game Area */}
+      <View style={styles.block}>
       <View style={styles.gameArea}>
         {renderCard()}
         {!gameState.isGameOver && 
@@ -352,7 +353,7 @@ export default function GameScreen() {
             <Image style={styles.mascot} source={getMascotImage()} />
           </View>
         }
-        </View>
+      </View>
 
       {/* Action Buttons */}
       <View style={styles.actionButtons}>
@@ -369,7 +370,10 @@ export default function GameScreen() {
         >
           <Ionicons name="checkmark" size={30} color={colors.white} />
                   </TouchableOpacity>
-                </View>
+        </View>
+        </View>
+
+
         </ImageBackground>
     </SafeAreaView>
   );
@@ -377,8 +381,6 @@ export default function GameScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    
     backgroundColor: '#fff', // Светло-желтый фон как на фото
   },
   div:{
@@ -386,11 +388,15 @@ const styles = StyleSheet.create({
     borderBottomEndRadius: 30,
     borderBottomLeftRadius: 30,
   },
+  block:{
+    marginTop: 50,
+    display: 'flex',
+    height: height,
+  },
   header: {
     paddingHorizontal: 20,
     paddingBottom: 10,
     paddingTop: 15,
-    // paddingVertical: 15,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -400,7 +406,7 @@ const styles = StyleSheet.create({
   },
   statsSection: {
     backgroundColor: 'transprant',
-    paddingHorizontal: 20,
+    paddingHorizontal: 30,
     paddingVertical: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -415,28 +421,28 @@ const styles = StyleSheet.create({
   },
   livesLabel: {
     color: colors.text,
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: '600',
     marginRight: 10,
   },
   scoreText: {
     color: colors.text,
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '600',
   },
   streakText: {
     color: colors.secondary,
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: '500',
   },
   chakChak: {
-    width: 40,
-    height: 40,
+    width: 30,
+    height: 30,
     marginRight: -10,
   },
   chakChakEmpty: {
-    width: 40,
-    height: 40,
+    width: 30,
+    height: 30,
     marginRight: -10,
     filter: 'brightness(0%)',
   },
@@ -454,45 +460,37 @@ const styles = StyleSheet.create({
     padding: 7,
   },
   avatarPlaceholder: {
-    width: 47,
-    height: 47,
+    width: 37,
+    height: 37,
     borderRadius: 30,
     backgroundColor: colors.white,
     justifyContent: 'center',
     alignItems: 'center',
-    // shadowColor: colors.black,
-    // shadowOffset: { width: 0, height: 2 },
-    // shadowOpacity: 0.2,
-    // shadowRadius: 4,
-    // elevation: 4,
+
   },
   chakChakAvatar: {
     width: 40,
     height: 40,
     borderRadius: 20,
     backgroundColor: '#FFD700',
-    // shadowColor: '#FFD700',
-    // shadowOffset: { width: 0, height: 2 },
-    // shadowOpacity: 0.3,
-    // shadowRadius: 3,
-    // elevation: 3,
   },
   userTextInfo: {
     alignItems: 'flex-end',
   },
   userHint: {
     color: '#8B8B8B',
-    fontSize: 14,
+    fontSize: 10,
     fontWeight: 'light',
     marginBottom: 2,
   },
   userLevel: {
     color: '#32D392',
-    fontSize: 18,
+    fontSize: 12,
     fontWeight: '600',
   },
   gameArea: {
-    flex: 1,
+    
+    // flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
@@ -501,8 +499,10 @@ const styles = StyleSheet.create({
     width: width - 30,
     height: height * 0.6,
     backgroundColor: '#fff',
-    borderRadius: 20,
- 
+    borderTopLeftRadius:20,
+    borderTopRightRadius: 20,
+
+
     padding: 30,
     paddingBottom: 120,
     // elevation: 8,
@@ -607,6 +607,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   actionButtons: {
+    width: width,
     backgroundColor: '#fff',
     borderRadius: 20,
     flexDirection: 'row',
