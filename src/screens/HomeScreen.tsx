@@ -7,6 +7,7 @@ import {
   Image,
   Dimensions,
   Animated,
+  ImageBackground,
 } from 'react-native';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
@@ -270,17 +271,18 @@ export default function GameScreen() {
           <Text style={styles.hintText}>Хмммм</Text>
           
           <View style={styles.wordContainer}>
-            <Text style={styles.languageLabel}>татарский:</Text>
-            <Text style={styles.tatarWord}>{currentCard.tatarWord}</Text>
+            <Text style={styles.languageLabel}>татарча:</Text>
+            <Text style={styles.Word}>{'«' + currentCard.tatarWord + '»'}</Text>
           </View>
 
           <View style={styles.arrowContainer}>
-            <Ionicons name="swap-vertical" size={24} color={colors.gray} />
+            <Image source={require('../../assets/arrows.png')}  />
+            {/* <Ionicons name="swap-vertical" size={24} color={colors.gray} /> */}
           </View>
 
           <View style={styles.wordContainer}>
-            <Text style={styles.languageLabel}>русский:</Text>
-            <Text style={styles.russianWord}>{currentCard.russianWord}</Text>
+            <Text style={styles.languageLabel}>по русский:</Text>
+            <Text style={styles.Word}>«{currentCard.russianWord}»</Text>
           </View>
         </Animated.View>
       </PanGestureHandler>
@@ -300,44 +302,47 @@ export default function GameScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <ImageBackground source={require('../../assets/back.png')} style={{width: '100%', height: '100%'}}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.menuButton}
-          onPress={() => navigation.navigate('Profile' as never)}
-        >
-          <Ionicons name="menu" size={30} color={'#000'} />
-        </TouchableOpacity>
-        
-        <View style={styles.userInfo}>
-          <View style={styles.userTextInfo}>
-            <Text style={styles.userLevel}>Уровень {user.level}</Text>
-            <Text style={styles.userHint}>10 xp до нового уровня!</Text>
-          </View>
-
+      <View style={styles.div}>
+        <View style={styles.header}>
           <TouchableOpacity 
+            style={styles.menuButton}
             onPress={() => navigation.navigate('Profile' as never)}
-            style={styles.avatarButton}
           >
-            <LinearGradient colors={['#FFF176', '#FF9800', '#5D08B8']} locations={[0, 0.3, 1]} style={styles.avatarContainer}>
-              <View style={styles.avatarPlaceholder}>
-                <Image source={require('../../assets/ava2.jpg')} style={styles.chakChakAvatar} />
-              </View>
-            </LinearGradient>
+            <Ionicons name="menu" size={30} color={'#000'} />
           </TouchableOpacity>
+          
+          <View style={styles.userInfo}>
+            <View style={styles.userTextInfo}>
+              <Text style={styles.userLevel}>Уровень {user.level}</Text>
+              <Text style={styles.userHint}>10 xp до нового уровня!</Text>
+            </View>
+
+            <TouchableOpacity 
+              onPress={() => navigation.navigate('Profile' as never)}
+              style={styles.avatarButton}
+            >
+              <LinearGradient colors={['#FFF176', '#FF9800', '#5D08B8']} locations={[0, 0.3, 1]} style={styles.avatarContainer}>
+                <View style={styles.avatarPlaceholder}>
+                  <Image source={require('../../assets/ava2.jpg')} style={styles.chakChakAvatar} />
+                </View>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Stats Section */}
+        <View style={styles.statsSection}>
+          <View style={styles.scoreContainer}>
+            <Text style={styles.scoreText}>Счет: {gameState.score}</Text>
+            {gameState.streak > 0 && (
+              <Text style={styles.streakText}>Серия: {gameState.streak}</Text>
+            )}
+            </View>
+          {renderChakChakLives()}
         </View>
       </View>
-
-      {/* Stats Section */}
-      <View style={styles.statsSection}>
-        <View style={styles.scoreContainer}>
-          <Text style={styles.scoreText}>Счет: {gameState.score}</Text>
-          {gameState.streak > 0 && (
-            <Text style={styles.streakText}>Серия: {gameState.streak}</Text>
-          )}
-          </View>
-        {renderChakChakLives()}
-        </View>
 
       {/* Game Area */}
       <View style={styles.gameArea}>
@@ -365,6 +370,7 @@ export default function GameScreen() {
           <Ionicons name="checkmark" size={30} color={colors.white} />
                   </TouchableOpacity>
                 </View>
+        </ImageBackground>
     </SafeAreaView>
   );
 }
@@ -372,12 +378,19 @@ export default function GameScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    
     backgroundColor: '#fff', // Светло-желтый фон как на фото
   },
-  header: {
+  div:{
     backgroundColor: '#fff',
+    borderBottomEndRadius: 30,
+    borderBottomLeftRadius: 30,
+  },
+  header: {
     paddingHorizontal: 20,
-    paddingVertical: 15,
+    paddingBottom: 10,
+    paddingTop: 15,
+    // paddingVertical: 15,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -386,14 +399,12 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   statsSection: {
-    backgroundColor: colors.white,
+    backgroundColor: 'transprant',
     paddingHorizontal: 20,
-    paddingVertical: 15,
+    paddingVertical: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
   },
   livesContainer: {
     flexDirection: 'row',
@@ -449,22 +460,22 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
+    // shadowColor: colors.black,
+    // shadowOffset: { width: 0, height: 2 },
+    // shadowOpacity: 0.2,
+    // shadowRadius: 4,
+    // elevation: 4,
   },
   chakChakAvatar: {
     width: 40,
     height: 40,
     borderRadius: 20,
     backgroundColor: '#FFD700',
-    shadowColor: '#FFD700',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
-    elevation: 3,
+    // shadowColor: '#FFD700',
+    // shadowOffset: { width: 0, height: 2 },
+    // shadowOpacity: 0.3,
+    // shadowRadius: 3,
+    // elevation: 3,
   },
   userTextInfo: {
     alignItems: 'flex-end',
@@ -487,52 +498,38 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   card: {
-    width: width - 40,
+    width: width - 30,
     height: height * 0.6,
     backgroundColor: '#fff',
     borderRadius: 20,
+ 
     padding: 30,
     paddingBottom: 120,
-    shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 8,
+    // elevation: 8,
     justifyContent: 'space-between',
   },
   questionText: {
     fontSize: 16,
-    color: colors.gray,
-    textAlign: 'center',
-    marginBottom: 5,
+    color: colors.black,
+    fontWeight: 700,
   },
   hintText: {
     fontSize: 14,
     color: colors.gray,
-    textAlign: 'center',
     fontStyle: 'italic',
-    marginBottom: 30,
   },
   wordContainer: {
-    alignItems: 'center',
     marginVertical: 15,
   },
   languageLabel: {
     fontSize: 14,
     color: colors.gray,
-    marginBottom: 8,
   },
-  tatarWord: {
-    fontSize: 28,
+  Word: {
+    fontSize: 32,
     fontWeight: 'bold',
     color: colors.text,
-    textAlign: 'center',
-  },
-  russianWord: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: colors.text,
-    textAlign: 'center',
+    textAlign: 'left',
   },
   arrowContainer: {
     alignItems: 'center',
@@ -610,10 +607,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   actionButtons: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingHorizontal: 40,
-    paddingVertical: 30,
+    // paddingHorizontal: 40,
+    paddingVertical: 20,
   },
   actionButton: {
     width: 70,
@@ -621,17 +620,17 @@ const styles = StyleSheet.create({
     borderRadius: 35,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 6,
+    // shadowColor: colors.black,
+    // shadowOffset: { width: 0, height: 4 },
+    // shadowOpacity: 0.3,
+    // shadowRadius: 6,
+    // elevation: 6,
   },
   wrongButton: {
-    backgroundColor: '#FF4444',
+    backgroundColor: '#FFBC8D',
   },
   correctButton: {
-    backgroundColor: '#44AA44',
+    backgroundColor: '#FFC9C9',
   },
 });
 

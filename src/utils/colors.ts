@@ -15,5 +15,7 @@ export const colors = {
   text: '#212121',
   textSecondary: '#757575',
   border: '#E0E0E0',
+  courseButton: '#FFC9C9',
+  courseAnotherButton: '#FFBC8D',
 };
 
