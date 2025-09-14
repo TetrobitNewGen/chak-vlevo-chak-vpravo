@@ -8,6 +8,11 @@ import { RootStackParamList } from '../types';
 
 // Импорт экранов
 import GameScreen from '../screens/HomeScreen';
+import ProfileScreen from '../screens/ProfileScreen';
+import RatingScreen from '../screens/RatingScreen'; // Added
+import StatisticsScreen from '../screens/StatisticsScreen'; // Added
+import FavoritesScreen from '../screens/FavoritesScreen'; // Added
+import LanguageScreen from '../screens/LanguageScreen'; // Added
 import SettingsScreen from '../screens/SettingsScreen';
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -38,18 +43,45 @@ export default function AppNavigator() {
       >
         <Stack.Screen name="Game" component={GameScreen} />
         <Stack.Screen 
+          name="Profile" 
+          component={ProfileScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen 
+          name="Rating" 
+          component={RatingScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen 
+          name="Statistics" 
+          component={StatisticsScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen 
+          name="Favorites" 
+          component={FavoritesScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen 
+          name="Language" 
+          component={LanguageScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen 
           name="Settings" 
           component={SettingsScreen}
           options={{
-            headerShown: true,
-            title: 'Настройки',
-            headerStyle: {
-              backgroundColor: colors.primary,
-            },
-            headerTintColor: colors.white,
-            headerTitleStyle: {
-              fontWeight: '600',
-            },
+            headerShown: false,
           }}
         />
       </Stack.Navigator>

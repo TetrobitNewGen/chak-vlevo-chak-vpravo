@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,12 +8,15 @@ import {
   Dimensions,
   Animated,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { colors } from '../utils/colors';
 import { WordCard, GameState, User } from '../types';
+import { LinearGradient } from 'expo-linear-gradient';
+import { userStore } from '../utils/userStore';
 
 const { width, height } = Dimensions.get('window');
 
@@ -27,17 +30,51 @@ const mockCards: WordCard[] = [
   { id: '6', tatarWord: 'Йорт', russianWord: 'Дом', isCorrect: true, difficulty: 'medium' },
   { id: '7', tatarWord: 'Күз', russianWord: 'Глаз', isCorrect: true, difficulty: 'hard' },
   { id: '8', tatarWord: 'Кул', russianWord: 'Рука', isCorrect: true, difficulty: 'hard' },
+  { id: '9', tatarWord: 'Аяк', russianWord: 'Нога', isCorrect: true, difficulty: 'easy' },
+  { id: '10', tatarWord: 'Баш', russianWord: 'Голова', isCorrect: true, difficulty: 'easy' },
+  { id: '11', tatarWord: 'Күңел', russianWord: 'Сердце', isCorrect: true, difficulty: 'medium' },
+  { id: '12', tatarWord: 'Күк', russianWord: 'Небо', isCorrect: true, difficulty: 'easy' },
+  { id: '13', tatarWord: 'Җир', russianWord: 'Земля', isCorrect: true, difficulty: 'medium' },
+  { id: '14', tatarWord: 'Кояш', russianWord: 'Солнце', isCorrect: true, difficulty: 'medium' },
+  { id: '15', tatarWord: 'Ай', russianWord: 'Луна', isCorrect: true, difficulty: 'easy' },
+  { id: '16', tatarWord: 'Йолдыз', russianWord: 'Звезда', isCorrect: true, difficulty: 'hard' },
+  { id: '17', tatarWord: 'Агач', russianWord: 'Дерево', isCorrect: true, difficulty: 'medium' },
+  { id: '18', tatarWord: 'Гөл', russianWord: 'Цветок', isCorrect: true, difficulty: 'easy' },
+  { id: '19', tatarWord: 'Балык', russianWord: 'Рыба', isCorrect: true, difficulty: 'easy' },
+  { id: '20', tatarWord: 'Эт', russianWord: 'Собака', isCorrect: true, difficulty: 'easy' },
+  { id: '21', tatarWord: 'Мәче', russianWord: 'Кошка', isCorrect: true, difficulty: 'easy' },
+  { id: '22', tatarWord: 'Сыер', russianWord: 'Корова', isCorrect: true, difficulty: 'medium' },
+  { id: '23', tatarWord: 'Куян', russianWord: 'Заяц', isCorrect: true, difficulty: 'medium' },
+  { id: '24', tatarWord: 'Аю', russianWord: 'Медведь', isCorrect: true, difficulty: 'hard' },
+  { id: '25', tatarWord: 'Кыргый', russianWord: 'Волк', isCorrect: true, difficulty: 'hard' },
+  // Неправильные переводы для усложнения
+  { id: '26', tatarWord: 'Алма', russianWord: 'Груша', isCorrect: false, difficulty: 'easy' },
+  { id: '27', tatarWord: 'Кош', russianWord: 'Рыба', isCorrect: false, difficulty: 'easy' },
+  { id: '28', tatarWord: 'Су', russianWord: 'Молоко', isCorrect: false, difficulty: 'easy' },
+  { id: '29', tatarWord: 'Ат', russianWord: 'Корова', isCorrect: false, difficulty: 'medium' },
+  { id: '30', tatarWord: 'Йорт', russianWord: 'Школа', isCorrect: false, difficulty: 'medium' },
 ];
 
-const mockUser: User = {
+const defaultUser: User = {
   id: '1',
   name: 'Йенифер',
   level: 10,
   avatar: 'https://via.placeholder.com/40x40/4CAF50/FFFFFF?text=Й',
 };
 
+// Функция для перемешивания массива карточек
+const shuffleCards = (cards: WordCard[]) => {
+  const shuffled = [...cards];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+};
+
 export default function GameScreen() {
   const navigation = useNavigation();
+  const [shuffledCards] = useState(() => shuffleCards(mockCards));
   const [gameState, setGameState] = useState<GameState>({
     currentCardIndex: 0,
     lives: 3,
@@ -45,12 +82,62 @@ export default function GameScreen() {
     streak: 0,
     isGameOver: false,
   });
+  const [mascotImage, setMascotImage] = useState<'think' | 'good' | 'fail'>('think');
+  const [user, setUser] = useState<User>(defaultUser);
+  const [currentSkin, setCurrentSkin] = useState<'default' | 'cat'>(userStore.getMascotSkin() as 'default' | 'cat');
 
   const translateX = useRef(new Animated.Value(0)).current;
   const rotate = useRef(new Animated.Value(0)).current;
   const scale = useRef(new Animated.Value(1)).current;
+  const opacity = useRef(new Animated.Value(1)).current;
 
-  const currentCard = mockCards[gameState.currentCardIndex];
+  const currentCard = shuffledCards[gameState.currentCardIndex];
+  
+  // Загружаем скин при запуске
+  useEffect(() => {
+    loadSkin();
+  }, []);
+
+  // Подписываемся на изменения в глобальном хранилище
+  useEffect(() => {
+    const unsubscribe = userStore.subscribe(() => {
+      setUser(prev => ({ ...prev, name: userStore.getUserName() }));
+      setCurrentSkin(userStore.getMascotSkin() as 'default' | 'cat');
+    });
+    return unsubscribe;
+  }, []);
+
+  const loadSkin = async () => {
+    await userStore.loadMascotSkinFromStorage();
+    setCurrentSkin(userStore.getMascotSkin() as 'default' | 'cat');
+  };
+
+  // Сброс анимации при смене карточки
+  useEffect(() => {
+    // Плавный сброс анимации
+    Animated.parallel([
+      Animated.timing(translateX, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(rotate, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scale, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [gameState.currentCardIndex]);
 
   const handleSwipe = (direction: 'left' | 'right') => {
     if (gameState.isGameOver) return;
@@ -58,39 +145,49 @@ export default function GameScreen() {
     const isCorrectAnswer = (direction === 'right' && currentCard.isCorrect) || 
                            (direction === 'left' && !currentCard.isCorrect);
 
-    if (isCorrectAnswer) {
-      setGameState(prev => ({
-        ...prev,
-        score: prev.score + 1,
-        streak: prev.streak + 1,
-        currentCardIndex: prev.currentCardIndex + 1,
-      }));
-    } else {
-      setGameState(prev => ({
-        ...prev,
-        lives: prev.lives - 1,
-        streak: 0,
-        currentCardIndex: prev.currentCardIndex + 1,
-        isGameOver: prev.lives - 1 <= 0,
-      }));
-    }
+    // Меняем картинку маскота в зависимости от ответа
+    setMascotImage(isCorrectAnswer ? 'good' : 'fail');
+
+    // Возвращаем картинку к исходной через 1.5 секунды
+    setTimeout(() => {
+      setMascotImage('think');
+    }, 1500);
 
     // Анимация свайпа
     Animated.parallel([
       Animated.timing(translateX, {
         toValue: direction === 'right' ? width : -width,
-        duration: 300,
+        duration: 250,
         useNativeDriver: true,
       }),
       Animated.timing(rotate, {
         toValue: direction === 'right' ? 1 : -1,
-        duration: 300,
+        duration: 250,
+        useNativeDriver: true,
+      }),
+      Animated.timing(opacity, {
+        toValue: 0,
+        duration: 250,
         useNativeDriver: true,
       }),
     ]).start(() => {
-      // Сброс анимации для следующей карточки
-      translateX.setValue(0);
-      rotate.setValue(0);
+      // Обновляем состояние после завершения анимации
+      if (isCorrectAnswer) {
+        setGameState(prev => ({
+          ...prev,
+          score: prev.score + 1,
+          streak: prev.streak + 1,
+          currentCardIndex: (prev.currentCardIndex + 1) % shuffledCards.length,
+        }));
+      } else {
+        setGameState(prev => ({
+          ...prev,
+          lives: prev.lives - 1,
+          streak: 0,
+          currentCardIndex: (prev.currentCardIndex + 1) % shuffledCards.length,
+          isGameOver: prev.lives - 1 <= 0,
+        }));
+      }
     });
   };
 
@@ -99,7 +196,8 @@ export default function GameScreen() {
       <View style={styles.livesContainer}>
         <Text style={styles.livesLabel}>HP:</Text>
         {Array.from({ length: 3 }, (_, index) => (
-          <View
+          <Image
+            source={require('../../assets/chak-empty.png')}
             key={index}
             style={[
               styles.chakChak,
@@ -112,13 +210,11 @@ export default function GameScreen() {
   };
 
   const renderCard = () => {
-    if (!currentCard || gameState.isGameOver) {
+    if (gameState.isGameOver) {
       return (
         <View style={styles.gameOverContainer}>
-          <Text style={styles.gameOverText}>
-            {gameState.isGameOver ? 'Игра окончена!' : 'Поздравляем!'}
-          </Text>
-          <Text style={styles.scoreText}>Счет: {gameState.score}</Text>
+          <Text style={styles.gameOverText}>Игра окончена!</Text>
+          <Text style={styles.gameOverScoreText}>Счет: {gameState.score}</Text>
           <TouchableOpacity
             style={styles.restartButton}
             onPress={() => setGameState({
@@ -131,6 +227,14 @@ export default function GameScreen() {
           >
             <Text style={styles.restartButtonText}>Играть снова</Text>
           </TouchableOpacity>
+        </View>
+      );
+    }
+
+    if (!currentCard) {
+      return (
+        <View style={styles.card}>
+          <Text style={styles.questionText}>Загрузка...</Text>
         </View>
       );
     }
@@ -170,6 +274,7 @@ export default function GameScreen() {
                 },
                 { scale },
               ],
+              opacity,
             },
           ]}
         >
@@ -189,21 +294,31 @@ export default function GameScreen() {
             <Text style={styles.languageLabel}>русский:</Text>
             <Text style={styles.russianWord}>{currentCard.russianWord}</Text>
           </View>
-
-          {/* Маскот персонаж */}
-          <View style={styles.mascotContainer}>
-            <View style={styles.mascot}>
-              <View style={styles.mascotBody} />
-              <View style={styles.mascotCap} />
-              <View style={styles.mascotEyes}>
-                <View style={styles.eye} />
-                <View style={styles.eye} />
-              </View>
-            </View>
-          </View>
         </Animated.View>
       </PanGestureHandler>
     );
+  };
+
+  const getMascotImage = () => {
+    if (currentSkin === 'cat') {
+      switch (mascotImage) {
+        case 'good':
+          return require('../../assets/cat-good.png');
+        case 'fail':
+          return require('../../assets/cat-fail.png');
+        default:
+          return require('../../assets/cat-think.png');
+      }
+    } else {
+      switch (mascotImage) {
+        case 'good':
+          return require('../../assets/chak-good.png');
+        case 'fail':
+          return require('../../assets/chak-fail.png');
+        default:
+          return require('../../assets/chak-think.png');
+      }
+    }
   };
 
   return (
@@ -212,41 +327,67 @@ export default function GameScreen() {
       <View style={styles.header}>
         <TouchableOpacity 
           style={styles.menuButton}
-          onPress={() => navigation.navigate('Settings' as never)}
+          onPress={() => navigation.navigate('Profile' as never)}
         >
-          <Ionicons name="settings" size={24} color={colors.white} />
+          <Ionicons name="menu" size={30} color={'#000'} />
         </TouchableOpacity>
         
-        {renderChakChakLives()}
-        
         <View style={styles.userInfo}>
-          <Text style={styles.userName}>{mockUser.name}</Text>
-          <Text style={styles.userLevel}>{mockUser.level} уровень</Text>
-          <Image source={{ uri: mockUser.avatar }} style={styles.avatar} />
+          <View style={styles.userTextInfo}>
+            <Text style={styles.userLevel}>Уровень {user.level}</Text>
+            <Text style={styles.userHint}>10 xp до нового уровня!</Text>
+          </View>
+
+          <TouchableOpacity 
+            onPress={() => navigation.navigate('Profile' as never)}
+            style={styles.avatarButton}
+          >
+            <LinearGradient colors={['#FFF176', '#FF9800', '#5D08B8']} locations={[0, 0.3, 1]} style={styles.avatarContainer}>
+              <View style={styles.avatarPlaceholder}>
+                <Image source={require('../../assets/ava2.jpg')} style={styles.chakChakAvatar} />
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
         </View>
       </View>
+
+      {/* Stats Section */}
+      <View style={styles.statsSection}>
+        <View style={styles.scoreContainer}>
+          <Text style={styles.scoreText}>Счет: {gameState.score}</Text>
+          {gameState.streak > 0 && (
+            <Text style={styles.streakText}>Серия: {gameState.streak}</Text>
+          )}
+          </View>
+        {renderChakChakLives()}
+        </View>
 
       {/* Game Area */}
       <View style={styles.gameArea}>
         {renderCard()}
-      </View>
+        {!gameState.isGameOver && 
+          <View style={styles.mascotContainer}>
+            <Image style={styles.mascot} source={getMascotImage()} />
+          </View>
+        }
+        </View>
 
       {/* Action Buttons */}
       <View style={styles.actionButtons}>
-        <TouchableOpacity
+            <TouchableOpacity
           style={[styles.actionButton, styles.wrongButton]}
           onPress={() => handleSwipe('left')}
-        >
+            >
           <Ionicons name="close" size={30} color={colors.white} />
-        </TouchableOpacity>
+            </TouchableOpacity>
         
-        <TouchableOpacity
+            <TouchableOpacity
           style={[styles.actionButton, styles.correctButton]}
           onPress={() => handleSwipe('right')}
         >
           <Ionicons name="checkmark" size={30} color={colors.white} />
-        </TouchableOpacity>
-      </View>
+                  </TouchableOpacity>
+                </View>
     </SafeAreaView>
   );
 }
@@ -254,10 +395,10 @@ export default function GameScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF8E1', // Светло-желтый фон как на фото
+    backgroundColor: '#fff', // Светло-желтый фон как на фото
   },
   header: {
-    backgroundColor: colors.primary,
+    backgroundColor: '#fff',
     paddingHorizontal: 20,
     paddingVertical: 15,
     flexDirection: 'row',
@@ -267,51 +408,100 @@ const styles = StyleSheet.create({
   menuButton: {
     padding: 5,
   },
+  statsSection: {
+    backgroundColor: colors.white,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
+  },
   livesContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
+  scoreContainer: {
+    alignItems: 'flex-start',
+  },
   livesLabel: {
-    color: colors.white,
+    color: colors.text,
     fontSize: 16,
     fontWeight: '600',
     marginRight: 10,
   },
+  scoreText: {
+    color: colors.text,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  streakText: {
+    color: colors.secondary,
+    fontSize: 12,
+    fontWeight: '500',
+  },
   chakChak: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: '#FFD700', // Золотой цвет чак-чак
-    marginRight: 5,
+    width: 40,
+    height: 40,
+    marginRight: -10,
+  },
+  chakChakEmpty: {
+    width: 40,
+    height: 40,
+    marginRight: -10,
+    filter: 'brightness(0%)',
+  },
+  userInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    flex: 1,
+  },
+  avatarButton: {
+    marginLeft: 15,
+  },
+  avatarContainer: {
+    borderRadius: 30,
+    padding: 7,
+  },
+  avatarPlaceholder: {
+    width: 47,
+    height: 47,
+    borderRadius: 30,
+    backgroundColor: colors.white,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: colors.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  chakChakAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#FFD700',
     shadowColor: '#FFD700',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
     elevation: 3,
   },
-  chakChakEmpty: {
-    backgroundColor: '#D3D3D3', // Серый для пустых жизней
-    shadowOpacity: 0,
+  userTextInfo: {
+    alignItems: 'flex-end',
   },
-  userInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  userName: {
-    color: colors.white,
-    fontSize: 16,
-    fontWeight: '600',
-    marginRight: 10,
+  userHint: {
+    color: '#8B8B8B',
+    fontSize: 14,
+    fontWeight: 'light',
+    marginBottom: 2,
   },
   userLevel: {
-    color: colors.secondary,
-    fontSize: 12,
-    marginRight: 10,
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    color: '#32D392',
+    fontSize: 18,
+    fontWeight: '600',
   },
   gameArea: {
     flex: 1,
@@ -322,9 +512,10 @@ const styles = StyleSheet.create({
   card: {
     width: width - 40,
     height: height * 0.6,
-    backgroundColor: colors.white,
+    backgroundColor: '#fff',
     borderRadius: 20,
     padding: 30,
+    paddingBottom: 120,
     shadowColor: colors.black,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.15,
@@ -371,13 +562,15 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   mascotContainer: {
+    position: 'absolute',
+    bottom: -20,
     alignItems: 'center',
     marginTop: 20,
   },
   mascot: {
     position: 'relative',
-    width: 80,
-    height: 80,
+    width: 150,
+    height: 150,
   },
   mascotBody: {
     width: 60,
@@ -423,7 +616,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
   },
-  scoreText: {
+  gameOverScoreText: {
     fontSize: 18,
     color: colors.gray,
     marginBottom: 30,

@@ -55,7 +55,8 @@
       }
     },
     "plugins": [
-      "expo-build-properties"
+      "expo-build-properties",
+      "expo-font"
     ]
   }
 }

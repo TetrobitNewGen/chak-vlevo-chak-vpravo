@@ -6,75 +6,90 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  Switch,
-  Alert,
+  Dimensions,
   Modal,
   TextInput,
-  Dimensions,
+  Alert,
 } from 'react-native';
-import { launchImageLibrary, ImagePickerResponse, MediaType } from 'react-native-image-picker';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { colors } from '../utils/colors';
-import { userStore } from '../utils/userStore';
 import { LinearGradient } from 'expo-linear-gradient';
+import { userStore } from '../utils/userStore';
+import { launchImageLibrary, ImagePickerResponse, MediaType } from 'react-native-image-picker';
 
 const { width } = Dimensions.get('window');
 
-export default function SettingsScreen() {
+export default function ProfileScreen() {
   const navigation = useNavigation();
-  const [soundEnabled, setSoundEnabled] = useState(true);
-  const [vibrationEnabled, setVibrationEnabled] = useState(true);
-  const [difficulty, setDifficulty] = useState(userStore.getDifficulty());
+  const route = useRoute();
   const [userAvatar, setUserAvatar] = useState(require('../../assets/ava2.jpg'));
-  const [userName, setUserName] = useState(userStore.getUserName());
+  const [currentLanguage, setCurrentLanguage] = useState('russian');
   const [showEditModal, setShowEditModal] = useState(false);
   const [showNameModal, setShowNameModal] = useState(false);
   const [showPhotoModal, setShowPhotoModal] = useState(false);
+  const [userName, setUserName] = useState(userStore.getUserName());
   const [newName, setNewName] = useState('');
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
-  const [currentSkin, setCurrentSkin] = useState(userStore.getMascotSkin());
-
-  // Загружаем сохраненную сложность и скин при запуске
-  useEffect(() => {
-    loadDifficulty();
-    loadSkin();
-  }, []);
 
   // Подписываемся на изменения в глобальном хранилище
   useEffect(() => {
     const unsubscribe = userStore.subscribe(() => {
       setUserName(userStore.getUserName());
-      setDifficulty(userStore.getDifficulty());
-      setCurrentSkin(userStore.getMascotSkin());
     });
     return unsubscribe;
   }, []);
 
-  const loadDifficulty = async () => {
-    await userStore.loadDifficultyFromStorage();
-    setDifficulty(userStore.getDifficulty());
-  };
+  // Получаем выбранный язык от LanguageScreen
+  useEffect(() => {
+    if (route.params && (route.params as any).selectedLanguage) {
+      setCurrentLanguage((route.params as any).selectedLanguage);
+    }
+  }, [route.params]);
 
-  const loadSkin = async () => {
-    await userStore.loadMascotSkinFromStorage();
-    setCurrentSkin(userStore.getMascotSkin());
-  };
+  const profileCards = [
+    {
+      id: '1',
+      icon: 'person-outline',
+      label: 'профиль:',
+      value: userName,
+    },
+    {
+      id: '2',
+      icon: 'bar-chart-outline',
+      label: 'рейтинг:',
+      value: '9274 место',
+    },
+    {
+      id: '3',
+      icon: 'trending-up-outline',
+      label: 'статистика:',
+      value: '10 дней',
+    },
+    {
+      id: '4',
+      icon: 'heart-outline',
+      label: 'любимое:',
+      value: '15 слов',
+    },
+    {
+      id: '5',
+      icon: 'settings-outline',
+      label: currentLanguage === 'russian' ? 'Русский 🇷🇺' : 'Татарский 🏴',
+      value: ' Сменить язык',
+    },
+    {
+      id: '6',
+      icon: 'cog-outline',
+      label: '',
+      value: 'Все настройки',
+    },
+  ];
 
-  const handleSkinChange = () => {
-    const newSkin = currentSkin === 'default' ? 'cat' : 'default';
-    userStore.setMascotSkin(newSkin);
-  };
-
-  const handleEditProfile = () => {
-    setShowEditModal(true);
-  };
-
-  const handleChangeName = () => {
-    setNewName(userName);
-    setShowEditModal(false);
-    setShowNameModal(true);
+  const handleLanguageChange = (newLanguage: string) => {
+    setCurrentLanguage(newLanguage);
   };
 
   const handleNameChange = () => {
@@ -86,7 +101,13 @@ export default function SettingsScreen() {
     }
   };
 
-  const handleChangeAvatar = () => {
+  const handleChangeNamePress = () => {
+    setNewName(userName);
+    setShowEditModal(false);
+    setShowNameModal(true);
+  };
+
+  const handleChangePhotoPress = () => {
     setShowEditModal(false);
     setShowPhotoModal(true);
   };
@@ -129,107 +150,34 @@ export default function SettingsScreen() {
     setShowPhotoModal(false);
   };
 
-  const handleChangeDifficulty = () => {
-    Alert.alert('Сложность', 'Выберите уровень сложности', [
-      { text: 'Легкий', onPress: () => {
-          setDifficulty('easy');
-          userStore.setDifficulty('easy');
-        }
-      },
-      { text: 'Средний', onPress: () => {
-          setDifficulty('medium');
-          userStore.setDifficulty('medium');
-        }
-      },
-      { text: 'Сложный', onPress: () => {
-          setDifficulty('hard');
-          userStore.setDifficulty('hard');
-        }
-      },
-      { text: 'Отмена', style: 'cancel' },
-    ]);
+
+  const handleCardPress = (cardId: string) => {
+    if (cardId === '1') {
+      // Показать модальное окно редактирования профиля
+      setShowEditModal(true);
+    } else if (cardId === '2') {
+      // Переход к рейтингу
+      navigation.navigate('Rating' as never);
+    } else if (cardId === '3') {
+      // Переход к статистике
+      navigation.navigate('Statistics' as never);
+    } else if (cardId === '4') {
+      // Переход к любимым словам
+      navigation.navigate('Favorites' as never);
+    } else if (cardId === '5') {
+      // Переход к настройкам языка
+      navigation.navigate('Language' as never);
+    } else if (cardId === '6') {
+      // Переход к настройкам игры
+      navigation.navigate('Settings' as never);
+    } else {
+      console.log(`Нажата карточка: ${cardId}`);
+    }
   };
 
-  const handleResetProgress = () => {
-    Alert.alert(
-      'Сброс прогресса',
-      'Вы уверены, что хотите сбросить весь прогресс? Это действие нельзя отменить.',
-      [
-        { text: 'Отмена', style: 'cancel' },
-        { text: 'Сбросить', style: 'destructive', onPress: () => console.log('Прогресс сброшен') },
-      ]
-    );
-  };
-
-  const settingsCards = [
-    {
-      id: '1',
-      icon: 'create-outline',
-      label: 'Редактировать профиль',
-      value: 'Имя и фото',
-      onPress: handleEditProfile,
-    },
-    {
-      id: '2',
-      icon: 'trending-up-outline',
-      label: 'Сложность',
-      value: difficulty === 'easy' ? 'Легкий' : difficulty === 'medium' ? 'Средний' : 'Сложный',
-      onPress: handleChangeDifficulty,
-    },
-    {
-      id: '3',
-      icon: 'volume-high-outline',
-      label: 'Звук',
-      value: soundEnabled ? 'Включен' : 'Выключен',
-      onPress: () => setSoundEnabled(!soundEnabled),
-    },
-    {
-      id: '4',
-      icon: 'phone-portrait-outline',
-      label: 'Вибрация',
-      value: vibrationEnabled ? 'Включена' : 'Выключена',
-      onPress: () => setVibrationEnabled(!vibrationEnabled),
-    },
-    {
-      id: '5',
-      icon: 'refresh-outline',
-      label: 'Сбросить прогресс',
-      value: 'Осторожно!',
-      onPress: handleResetProgress,
-      isDanger: true,
-    },
-    {
-      id: '6',
-      icon: 'help-circle-outline',
-      label: 'Правила игры',
-      value: 'Как играть',
-      onPress: () => console.log('Правила игры'),
-    },
-    {
-      id: '7',
-      icon: 'information-circle-outline',
-      label: 'О приложении',
-      value: 'Версия 1.0.0',
-      onPress: () => console.log('О приложении'),
-    },
-    {
-      id: '8',
-      icon: 'star-outline',
-      label: 'Оценить приложение',
-      value: 'В App Store',
-      onPress: () => console.log('Оценить приложение'),
-    },
-    {
-      id: '9',
-      icon: 'color-palette-outline',
-      label: 'Скины',
-      value: currentSkin === 'default' ? 'Оригинал' : 'Кот',
-      onPress: handleSkinChange,
-    },
-  ];
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity 
@@ -238,36 +186,40 @@ export default function SettingsScreen() {
         >
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Настройки</Text>
+        <Text style={styles.headerTitle}>Профиль</Text>
         <View style={styles.headerRight} />
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Profile Section */}
+         <View style={styles.profileSection}>
+           <LinearGradient colors={['#FFF176', '#FF9800', '#5D08B8']} locations={[0, 0.3, 1]} style={styles.avatarContainer}>
+             <View style={styles.avatarPlaceholder}>
+               <Image source={userAvatar} style={styles.profileAvatar} />
+             </View>
+           </LinearGradient>
+          <Text style={styles.profileName}>{userName}</Text>
+          <Text style={styles.profileLevel}>Уровень 10</Text>
+          <Text style={styles.profileHint}>10 xp до нового уровня!</Text>
+        </View>
 
-        {/* Settings Cards Grid */}
+        {/* Cards Grid */}
         <View style={styles.cardsContainer}>
-          {settingsCards.map((card) => (
+          {profileCards.map((card) => (
             <TouchableOpacity
               key={card.id}
-              style={[styles.card, card.isDanger && styles.dangerCard]}
-              onPress={card.onPress}
+              style={styles.card}
+              onPress={() => handleCardPress(card.id)}
             >
               <View style={styles.cardIcon}>
-                <Ionicons 
-                  name={card.icon as any} 
-                  size={24} 
-                  color={card.isDanger ? colors.error : colors.primary} 
-                />
+                <Ionicons name={card.icon as any} size={24} color={colors.primary} />
               </View>
-              <Text style={[styles.cardLabel, card.isDanger && styles.dangerText]}>
-                {card.label}
-              </Text>
-              <Text style={[styles.cardValue, card.isDanger && styles.dangerText]}>
-                {card.value}
-              </Text>
+              <Text style={styles.cardLabel}>{card.label}</Text>
+              <Text style={styles.cardValue}>{card.value}</Text>
             </TouchableOpacity>
           ))}
         </View>
+
       </ScrollView>
 
       {/* Edit Profile Modal */}
@@ -283,7 +235,7 @@ export default function SettingsScreen() {
             
             <TouchableOpacity 
               style={styles.modalButton}
-              onPress={handleChangeName}
+              onPress={handleChangeNamePress}
             >
               <Ionicons name="person-outline" size={24} color={colors.primary} />
               <Text style={styles.modalButtonText}>Сменить имя</Text>
@@ -291,10 +243,10 @@ export default function SettingsScreen() {
 
             <TouchableOpacity 
               style={styles.modalButton}
-              onPress={handleChangeAvatar}
+              onPress={handleChangePhotoPress}
             >
               <Ionicons name="camera-outline" size={24} color={colors.primary} />
-              <Text style={styles.modalButtonText}>Сменить аватар</Text>
+              <Text style={styles.modalButtonText}>Сменить фото</Text>
             </TouchableOpacity>
 
             <TouchableOpacity 
@@ -344,6 +296,7 @@ export default function SettingsScreen() {
           </View>
         </View>
       </Modal>
+
 
       {/* Change Photo Modal */}
       <Modal
@@ -397,31 +350,24 @@ export default function SettingsScreen() {
           </View>
         </View>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.white,
   },
   header: {
     backgroundColor: colors.white,
     paddingHorizontal: 20,
-    paddingVertical: 4,
-    paddingTop: 50,
+    paddingVertical: 15,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginHorizontal: 20,
-    marginTop: 10,
-    borderRadius: 15,
-    shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
   },
   backButton: {
     padding: 5,
@@ -437,9 +383,53 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
+  profileSection: {
+    alignItems: 'center',
+    paddingVertical: 40,
+    backgroundColor: colors.white,
+  },
+  avatarContainer: {
+    borderRadius: 50,
+    padding: 8,
+    marginBottom: 20,
+  },
+  avatarPlaceholder: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: colors.white,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: colors.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  profileAvatar: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+  },
+  profileName: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: colors.text,
+    marginBottom: 8,
+  },
+  profileLevel: {
+    fontSize: 18,
+    color: '#32D392',
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  profileHint: {
+    color: '#8B8B8B',
+    fontSize: 14,
+    fontWeight: 'light',
+  },
   cardsContainer: {
     paddingHorizontal: 20,
-    paddingTop: 20,
     paddingBottom: 20,
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -458,10 +448,6 @@ const styles = StyleSheet.create({
     width: (width - 60) / 2, // Ширина для 2 карточек в ряду
     alignItems: 'center',
   },
-  dangerCard: {
-    borderWidth: 1,
-    borderColor: colors.error,
-  },
   cardIcon: {
     marginBottom: 12,
   },
@@ -477,9 +463,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.text,
     textAlign: 'center',
-  },
-  dangerText: {
-    color: colors.error,
   },
   modalOverlay: {
     flex: 1,
