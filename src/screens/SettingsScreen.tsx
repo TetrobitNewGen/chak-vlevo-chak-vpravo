@@ -16,6 +16,7 @@ import { launchImageLibrary, ImagePickerResponse, MediaType } from 'react-native
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { Audio } from 'expo-av';
 import { colors } from '../utils/colors';
 import { userStore } from '../utils/userStore';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -34,17 +35,38 @@ export default function SettingsScreen() {
   const [showPhotoModal, setShowPhotoModal] = useState(false);
   const [newName, setNewName] = useState('');
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+  const [currentSkin, setCurrentSkin] = useState(userStore.getMascotSkin());
 
-  // Загружаем сохраненную сложность при запуске
+  // Загружаем сохраненную сложность и скин при запуске
   useEffect(() => {
     loadDifficulty();
+    loadSkin();
   }, []);
+
+  // Функция для воспроизведения звука тапа
+  const playTapSound = async () => {
+    try {
+      const { sound } = await Audio.Sound.createAsync(
+        require('../../assets/tap-resonant.aif')
+      );
+      await sound.playAsync();
+      // Освобождаем ресурсы после воспроизведения
+      sound.setOnPlaybackStatusUpdate((status: any) => {
+        if (status.isLoaded && status.didJustFinish) {
+          sound.unloadAsync();
+        }
+      });
+    } catch (error) {
+      console.log('Ошибка воспроизведения звука:', error);
+    }
+  };
 
   // Подписываемся на изменения в глобальном хранилище
   useEffect(() => {
     const unsubscribe = userStore.subscribe(() => {
       setUserName(userStore.getUserName());
       setDifficulty(userStore.getDifficulty());
+      setCurrentSkin(userStore.getMascotSkin());
     });
     return unsubscribe;
   }, []);
@@ -54,18 +76,31 @@ export default function SettingsScreen() {
     setDifficulty(userStore.getDifficulty());
   };
 
+  const loadSkin = async () => {
+    await userStore.loadMascotSkinFromStorage();
+    setCurrentSkin(userStore.getMascotSkin());
+  };
+
+  const handleSkinChange = () => {
+    playTapSound();
+    const newSkin = currentSkin === 'default' ? 'cat' : 'default';
+    userStore.setMascotSkin(newSkin);
+  };
 
   const handleEditProfile = () => {
+    playTapSound();
     setShowEditModal(true);
   };
 
   const handleChangeName = () => {
+    playTapSound();
     setNewName(userName);
     setShowEditModal(false);
     setShowNameModal(true);
   };
 
   const handleNameChange = () => {
+    playTapSound();
     if (newName.trim()) {
       const trimmedName = newName.trim();
       userStore.setUserName(trimmedName);
@@ -75,6 +110,7 @@ export default function SettingsScreen() {
   };
 
   const handleChangeAvatar = () => {
+    playTapSound();
     setShowEditModal(false);
     setShowPhotoModal(true);
   };
@@ -103,6 +139,7 @@ export default function SettingsScreen() {
   };
 
   const confirmPhotoChange = () => {
+    playTapSound();
     if (selectedPhoto) {
       setUserAvatar({ uri: selectedPhoto });
       userStore.setUserAvatar(selectedPhoto);
@@ -113,23 +150,28 @@ export default function SettingsScreen() {
   };
 
   const cancelPhotoChange = () => {
+    playTapSound();
     setSelectedPhoto(null);
     setShowPhotoModal(false);
   };
 
   const handleChangeDifficulty = () => {
+    playTapSound();
     Alert.alert('Сложность', 'Выберите уровень сложности', [
       { text: 'Легкий', onPress: () => {
+          playTapSound();
           setDifficulty('easy');
           userStore.setDifficulty('easy');
         }
       },
       { text: 'Средний', onPress: () => {
+          playTapSound();
           setDifficulty('medium');
           userStore.setDifficulty('medium');
         }
       },
       { text: 'Сложный', onPress: () => {
+          playTapSound();
           setDifficulty('hard');
           userStore.setDifficulty('hard');
         }
@@ -139,12 +181,17 @@ export default function SettingsScreen() {
   };
 
   const handleResetProgress = () => {
+    playTapSound();
     Alert.alert(
       'Сброс прогресса',
       'Вы уверены, что хотите сбросить весь прогресс? Это действие нельзя отменить.',
       [
         { text: 'Отмена', style: 'cancel' },
-        { text: 'Сбросить', style: 'destructive', onPress: () => console.log('Прогресс сброшен') },
+        { text: 'Сбросить', style: 'destructive', onPress: () => {
+            playTapSound();
+            console.log('Прогресс сброшен');
+          }
+        },
       ]
     );
   };
@@ -169,14 +216,20 @@ export default function SettingsScreen() {
       icon: 'volume-high-outline',
       label: 'Звук',
       value: soundEnabled ? 'Включен' : 'Выключен',
-      onPress: () => setSoundEnabled(!soundEnabled),
+      onPress: () => {
+        playTapSound();
+        setSoundEnabled(!soundEnabled);
+      },
     },
     {
       id: '4',
       icon: 'phone-portrait-outline',
       label: 'Вибрация',
       value: vibrationEnabled ? 'Включена' : 'Выключена',
-      onPress: () => setVibrationEnabled(!vibrationEnabled),
+      onPress: () => {
+        playTapSound();
+        setVibrationEnabled(!vibrationEnabled);
+      },
     },
     {
       id: '5',
@@ -191,28 +244,37 @@ export default function SettingsScreen() {
       icon: 'help-circle-outline',
       label: 'Правила игры',
       value: 'Как играть',
-      onPress: () => console.log('Правила игры'),
+      onPress: () => {
+        playTapSound();
+        console.log('Правила игры');
+      },
     },
     {
       id: '7',
       icon: 'information-circle-outline',
       label: 'О приложении',
       value: 'Версия 1.0.0',
-      onPress: () => console.log('О приложении'),
+      onPress: () => {
+        playTapSound();
+        console.log('О приложении');
+      },
     },
     {
       id: '8',
       icon: 'star-outline',
       label: 'Оценить приложение',
       value: 'В App Store',
-      onPress: () => console.log('Оценить приложение'),
+      onPress: () => {
+        playTapSound();
+        console.log('Оценить приложение');
+      },
     },
     {
       id: '9',
       icon: 'color-palette-outline',
       label: 'Скины',
-      value: 'Темы оформления',
-      onPress: () => console.log('Скины'),
+      value: currentSkin === 'default' ? 'Оригинал' : 'Кот',
+      onPress: handleSkinChange,
     },
   ];
 
@@ -276,7 +338,10 @@ export default function SettingsScreen() {
 
             <TouchableOpacity 
               style={styles.cancelButton}
-              onPress={() => setShowEditModal(false)}
+              onPress={() => {
+                playTapSound();
+                setShowEditModal(false);
+              }}
             >
               <Text style={styles.cancelButtonText}>Отмена</Text>
             </TouchableOpacity>
@@ -314,7 +379,10 @@ export default function SettingsScreen() {
 
             <TouchableOpacity 
               style={styles.cancelButton}
-              onPress={() => setShowNameModal(false)}
+              onPress={() => {
+                playTapSound();
+                setShowNameModal(false);
+              }}
             >
               <Text style={styles.cancelButtonText}>Отмена</Text>
             </TouchableOpacity>
@@ -347,7 +415,10 @@ export default function SettingsScreen() {
 
             <TouchableOpacity 
               style={styles.modalButton}
-              onPress={openImagePicker}
+              onPress={() => {
+                playTapSound();
+                openImagePicker();
+              }}
             >
               <Ionicons name="images-outline" size={24} color={colors.primary} />
               <Text style={styles.modalButtonText}>
@@ -525,4 +596,3 @@ const styles = StyleSheet.create({
     color: colors.white,
   },
 });
-

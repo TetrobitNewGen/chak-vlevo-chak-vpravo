@@ -8,7 +8,7 @@ import {
   Dimensions,
   Animated,
 } from 'react-native';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -84,6 +84,7 @@ export default function GameScreen() {
   });
   const [mascotImage, setMascotImage] = useState<'think' | 'good' | 'fail'>('think');
   const [user, setUser] = useState<User>(defaultUser);
+  const [currentSkin, setCurrentSkin] = useState<'default' | 'cat'>(userStore.getMascotSkin() as 'default' | 'cat');
 
   const translateX = useRef(new Animated.Value(0)).current;
   const rotate = useRef(new Animated.Value(0)).current;
@@ -92,13 +93,24 @@ export default function GameScreen() {
 
   const currentCard = shuffledCards[gameState.currentCardIndex];
   
+  // Загружаем скин при запуске
+  useEffect(() => {
+    loadSkin();
+  }, []);
+
   // Подписываемся на изменения в глобальном хранилище
   useEffect(() => {
     const unsubscribe = userStore.subscribe(() => {
       setUser(prev => ({ ...prev, name: userStore.getUserName() }));
+      setCurrentSkin(userStore.getMascotSkin() as 'default' | 'cat');
     });
     return unsubscribe;
   }, []);
+
+  const loadSkin = async () => {
+    await userStore.loadMascotSkinFromStorage();
+    setCurrentSkin(userStore.getMascotSkin() as 'default' | 'cat');
+  };
 
   // Сброс анимации при смене карточки
   useEffect(() => {
@@ -288,13 +300,24 @@ export default function GameScreen() {
   };
 
   const getMascotImage = () => {
-    switch (mascotImage) {
-      case 'good':
-        return require('../../assets/chak-good.png');
-      case 'fail':
-        return require('../../assets/chak-fail.png');
-      default:
-        return require('../../assets/chak-think.png');
+    if (currentSkin === 'cat') {
+      switch (mascotImage) {
+        case 'good':
+          return require('../../assets/cat-good.png');
+        case 'fail':
+          return require('../../assets/cat-fail.png');
+        default:
+          return require('../../assets/cat-think.png');
+      }
+    } else {
+      switch (mascotImage) {
+        case 'good':
+          return require('../../assets/chak-good.png');
+        case 'fail':
+          return require('../../assets/chak-fail.png');
+        default:
+          return require('../../assets/chak-think.png');
+      }
     }
   };
 

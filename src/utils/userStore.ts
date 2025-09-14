@@ -5,6 +5,7 @@ class UserStore {
   private userName: string = 'Йенифер';
   private userAvatar: string = '';
   private difficulty: string = 'medium';
+  private mascotSkin: string = 'default';
   private listeners: Array<() => void> = [];
 
   getUserName(): string {
@@ -52,6 +53,36 @@ class UserStore {
       }
     } catch (error) {
       console.log('Ошибка загрузки сложности в userStore:', error);
+    }
+  }
+
+  getMascotSkin(): string {
+    return this.mascotSkin;
+  }
+
+  setMascotSkin(skin: string): void {
+    this.mascotSkin = skin;
+    this.saveMascotSkinToStorage(skin);
+    this.notifyListeners();
+  }
+
+  private async saveMascotSkinToStorage(skin: string): Promise<void> {
+    try {
+      await AsyncStorage.setItem('mascotSkin', skin);
+    } catch (error) {
+      console.log('Ошибка сохранения скина в userStore:', error);
+    }
+  }
+
+  async loadMascotSkinFromStorage(): Promise<void> {
+    try {
+      const savedSkin = await AsyncStorage.getItem('mascotSkin');
+      if (savedSkin) {
+        this.mascotSkin = savedSkin;
+        this.notifyListeners();
+      }
+    } catch (error) {
+      console.log('Ошибка загрузки скина в userStore:', error);
     }
   }
 
